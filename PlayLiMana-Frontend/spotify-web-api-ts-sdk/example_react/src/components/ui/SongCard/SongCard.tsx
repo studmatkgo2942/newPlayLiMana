@@ -16,7 +16,7 @@ type SongCardProps = {
 
 export const SongCard: React.FC<SongCardProps> = ({ songs }) => {
     const { sdk } = useSpotifyContext()
-    const { deviceId, playCustomAudio, stopCustomAudio } = usePlayback()
+    const { deviceId, playCustomAudio, stopCustomAudio, clearQueue } = usePlayback()
     const { audiusService } = useAudiusContext()
 
     const playSelectedSong = async (song: Song) => {
@@ -29,6 +29,7 @@ export const SongCard: React.FC<SongCardProps> = ({ songs }) => {
         )
         if (prebuiltStream) {
             stopCustomAudio()
+            clearQueue();
             playCustomAudio(prebuiltStream, {
                 title: song.title,
                 imageUrl: song.coverUrl,
@@ -50,6 +51,7 @@ export const SongCard: React.FC<SongCardProps> = ({ songs }) => {
         if (!streamUrl) return
 
         stopCustomAudio()
+        clearQueue();
         playCustomAudio(streamUrl, {
             title: song.title,
             imageUrl: song.coverUrl,

@@ -11,7 +11,13 @@ export const UseMusicControls = () => {
         customAudioRef,
         isCustomAudioPlaying,
         customTrackInfo,
-    } = usePlayback()
+        pauseCustomAudio,
+        resumeCustomAudio,
+        /* NEW ↓ */
+        queueNext,
+        queuePrev,
+        clearQueue
+    } = usePlayback();
     const { sdk } = useSpotifyContext()
 
     const IsLikelySDKParsingError = useCallback((error: unknown): boolean => {
@@ -21,53 +27,65 @@ export const UseMusicControls = () => {
     }, [])
 
     const HandlePlayPause = useCallback(async () => {
-        // Control the service that is actually playing or was last playing
-        console.log("CustomTrackInfo: " + JSON.stringify(customTrackInfo))
-        const isCustomAudioActive = customTrackInfo?.source === "audius"
-        const isSpotifyActive = currentState?.track_window?.current_track && !isCustomAudioActive
-
-        // Handle custom audio play/pause
-        if (isCustomAudioActive) {
-            const isPaused = currentState?.paused ?? true
-            if (isPaused) {
-                await customAudioRef.current.play()
+        /* ── 1)  Audius / custom-audio branch ─────────────────────────────── */
+        if (customTrackInfo) {
+            if (isCustomAudioPlaying || !customAudioRef.current?.paused) {
+                pauseCustomAudio();           // ⏸ pause the <audio> element
             } else {
-                customAudioRef.current.pause()
+                await resumeCustomAudio();    // ► resume it (and update state)
             }
-            return
+            return;
         }
 
-        // Handle Spotify play/pause
-        if (isSpotifyActive && sdk && isPlayerReady && deviceId) {
-            const isPaused = currentState?.paused ?? true
-            try {
-                if (isPaused) {
-                    await sdk.player.startResumePlayback(deviceId)
-                } else {
-                    await sdk.player.pausePlayback(deviceId)
-                }
-            } catch (err) {
-                if (!IsLikelySDKParsingError(err)) {
-                    console.error("Error toggling play/pause:", err)
-                }
-            }
-            return
+        /* ── 2)  Spotify branch ───────────────────────────────────────────── */
+        if (!sdk || !isPlayerReady || !deviceId) {
+            console.warn("Player/SDK not ready for play/pause");
+            return;
         }
+        pauseCustomAudio();
+        clearQueue();
 
-        console.warn("No active playback service available for play/pause")
-    }, [sdk, isPlayerReady, deviceId, currentState?.paused, customAudioRef, isCustomAudioPlaying, customTrackInfo, IsLikelySDKParsingError])
+        const isPaused = currentState?.paused ?? true;
+        try {
+            if (isPaused) {
+                await sdk.player.startResumePlayback(deviceId);   // ► play
+            } else {
+                await sdk.player.pausePlayback(deviceId);         // ⏸ pause
+            }
+        } catch (err) {
+            if (!IsLikelySDKParsingError(err)) {
+                console.error("Error toggling play/pause:", err);
+            }
+        }
+    }, [
+        /* deps */
+        sdk,
+        isPlayerReady,
+        deviceId,
+        currentState?.paused,
+        isCustomAudioPlaying,
+        customTrackInfo,
+        customAudioRef,
+        pauseCustomAudio,
+        resumeCustomAudio,
+        IsLikelySDKParsingError,
+    ]);
+
+
 
     const HandleNext = useCallback(async () => {
-        // Don't allow next/previous if we have custom track info (whether playing or not)
-        if (customTrackInfo) {
-            console.warn("Next/Previous not available for custom audio services")
-            return
+            /* ▶ Audius queue */
+        if (customTrackInfo) {      // does nothing when already at end
+            queueNext();
+            return;
         }
 
         if (!sdk || !isPlayerReady || !deviceId) {
             console.warn("Player/SDK not ready for next.")
             return
         }
+        pauseCustomAudio();
+        clearQueue();
 
         try {
             await sdk.player.skipToNext(deviceId)
@@ -76,19 +94,21 @@ export const UseMusicControls = () => {
                 console.error("Error skipping to next:", err)
             }
         }
-    }, [sdk, isPlayerReady, deviceId, isCustomAudioPlaying, customTrackInfo, IsLikelySDKParsingError])
+    }, [sdk, isPlayerReady, deviceId, queueNext, customTrackInfo, IsLikelySDKParsingError]);
 
     const HandlePrevious = useCallback(async () => {
-        // Don't allow next/previous if we have custom track info (whether playing or not)
+
         if (customTrackInfo) {
-            console.warn("Next/Previous not available for custom audio services")
-            return
+            queuePrev(); // does nothing when at index 0
+            return;
         }
 
         if (!sdk || !isPlayerReady || !deviceId) {
             console.warn("Player/SDK not ready for previous.")
             return
         }
+        pauseCustomAudio();
+        clearQueue();
 
         try {
             await sdk.player.skipToPrevious(deviceId)
@@ -97,7 +117,7 @@ export const UseMusicControls = () => {
                 console.error("Error skipping to previous:", err)
             }
         }
-    }, [sdk, isPlayerReady, deviceId, isCustomAudioPlaying, customTrackInfo, IsLikelySDKParsingError])
+    }, [sdk, isPlayerReady, deviceId, queuePrev, customTrackInfo, IsLikelySDKParsingError]);
 
     const HandleVolumeChange = useCallback(
         async (newVolume: number) => {
@@ -152,7 +172,7 @@ export const UseMusicControls = () => {
         // Handle Spotify seeking
         if (!isCustomAudioActive && sdk && isPlayerReady && deviceId) {
             try {
-                await sdk.player.seekToPosition(deviceId, seekPosition)
+                await sdk.player.seekToPosition(seekPosition, deviceId)
             } catch (err) {
                 if (!IsLikelySDKParsingError(err)) {
                     console.error("Error seeking:", err)
@@ -162,9 +182,9 @@ export const UseMusicControls = () => {
     }, [currentState, sdk, isPlayerReady, deviceId, customAudioRef, isCustomAudioPlaying, customTrackInfo, IsLikelySDKParsingError])
 
     // Determine controls enabled state
-    const isCustomAudioActive = isCustomAudioPlaying && customTrackInfo && customAudioRef?.current
-    const isSpotifyActive = currentState?.track_window?.current_track && !isCustomAudioActive
-    const controlsEnabled = (isCustomAudioActive && !!currentState) || (isSpotifyActive && isPlayerReady && !!currentState)
+    const isCustomAudioActive = !!customTrackInfo;
+    const isSpotifyActive = currentState?.track_window?.current_track && !isCustomAudioActive;
+    const controlsEnabled = isCustomAudioActive || (isSpotifyActive && isPlayerReady && !!currentState);
 
     return {
         HandlePlayPause,

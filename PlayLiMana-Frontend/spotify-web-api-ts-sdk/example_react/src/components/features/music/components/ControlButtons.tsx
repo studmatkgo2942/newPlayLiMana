@@ -21,6 +21,8 @@ interface ControlButtonsProps {
     onPlayPause: () => Promise<void>
     onNext: () => Promise<void>
     onCycleRepeat: () => Promise<void>
+    hasNext?: boolean;
+    hasPrev?: boolean;
 }
 
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -34,6 +36,8 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
                                                                   onPlayPause,
                                                                   onNext,
                                                                   onCycleRepeat,
+                                                                  hasNext,
+                                                                  hasPrev,
                                                               }) => {
     const { theme } = useTheme()
     const isDarkMode = theme === "dark"
@@ -64,10 +68,11 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
 
             <button
                 onClick={onPrevious}
-                disabled={!controlsEnabled || activeServiceName !== "spotify"}
+                disabled={ !controlsEnabled || (activeServiceName === "audius" ? !hasPrev : activeServiceName !== "spotify")}
                 className="controller-button"
                 aria-label="Previous track"
-                title={activeServiceName !== "spotify" ? "Previous not available for previews" : "Previous track"}
+                //title={activeServiceName !== "spotify" ? "Previous not available for previews" : "Previous track"}
+                title={activeServiceName === "spotify" ? "Previous track" : hasPrev ? "Previous (Audius queue)" : "No previous track" }
             >
                 {"<"} Prev
             </button>
@@ -84,10 +89,10 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
 
             <button
                 onClick={onNext}
-                disabled={!controlsEnabled || activeServiceName !== "spotify"}
+                disabled={!controlsEnabled || (activeServiceName === "audius" ? !hasNext : activeServiceName !== "spotify")}
                 className="controller-button"
                 aria-label="Next track"
-                title={activeServiceName !== "spotify" ? "Next not available for previews" : "Next track"}
+                title={activeServiceName === "spotify" ? "Next track" : hasNext ? "Next (Audius queue)" : "No next track"}
             >
                 Next {">"}
             </button>

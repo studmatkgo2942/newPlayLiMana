@@ -34,6 +34,8 @@ const MusicController: React.FC = () => {
         isCustomAudioPlaying,
         customTrackInfo,
         clearCustomTrackInfo,
+        queueIndex,
+        audiusQueue,
     } = usePlayback()
 
     const {theme} = useTheme()
@@ -115,7 +117,8 @@ const MusicController: React.FC = () => {
         ? customTrackInfo.title.split(" - ")[1] || customTrackInfo.source || "Unknown"
         : (currentTrack?.artists?.map((artist: { name: SimplifiedArtist }) => artist.name).join(", ") ?? "")
 
-    const isPaused = currentState?.paused ?? true
+    //const isPaused = currentState?.paused ?? true
+    const isPaused = isCustomAudioActive ? !isCustomAudioPlaying : currentState?.paused ?? true;
     const nextTrack = isSpotifyActive ? currentState?.track_window?.next_tracks?.[0] : null
     const duration = currentState?.duration ?? 0
     const shuffleState = currentState?.shuffle ?? false
@@ -149,6 +152,9 @@ const MusicController: React.FC = () => {
         await HandleVolumeChange(newVolume)
     }
 
+    const hasAudiusNext = customTrackInfo && queueIndex + 1 < audiusQueue.length;
+    const hasAudiusPrev = customTrackInfo && queueIndex > 0;
+
     return (
         <div className="music-controller">
             <TrackInfo
@@ -172,6 +178,8 @@ const MusicController: React.FC = () => {
                     onPlayPause={HandlePlayPause}
                     onNext={HandleNext}
                     onCycleRepeat={HandleCycleRepeatMode}
+                    hasNext={hasAudiusNext}
+                    hasPrev={hasAudiusPrev}
                 />
 
                 <ProgressBar

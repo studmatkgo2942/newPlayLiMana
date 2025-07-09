@@ -1,4 +1,11 @@
-import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth"
+import {
+    getAuth,
+    updatePassword,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    updateEmail,
+    sendEmailVerification
+} from "firebase/auth"
 
 export interface UserAccountService {
     updateUsername(newUsername: string): Promise<any>
@@ -11,21 +18,44 @@ export interface UserAccountService {
 }
 
 export class FirebaseUserAccountService implements UserAccountService {
-    async updateUsername(newUsername: string): Promise<any> {
-        const response = await fetch("/api/v1/auth/username", {
+    async updateUsername(newEmail: string): Promise<any> {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) throw new Error("User not authenticated");
+
+        /* 1) change the e-mail inside Firebase */
+        try {
+            await updateEmail(user, newEmail);
+        } catch (err: any) {
+            if (err.code === "auth/requires-recent-login") {
+                const pwd = prompt("Please re-enter your password");
+                if (!pwd) throw new Error("Re-authentication cancelled");
+                const cred = EmailAuthProvider.credential(user.email!, pwd);
+                await reauthenticateWithCredential(user, cred);
+                await updateEmail(user, newEmail);     // retry
+            } else {
+                throw err;
+            }
+        }
+
+        /* 2) send a fresh verification link */
+        await sendEmailVerification(user, {
+            // optional: deep-link after verification
+            url: `${window.location.origin}/emailVerified`
+        });
+
+        /* 3) update your back-end only after Firebase succeeds */
+        const resp = await fetch("/api/v1/auth/username", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${await this.getAuthToken()}`,
+                Authorization: `Bearer ${await user.getIdToken()}`,
             },
-            body: JSON.stringify({ newUsername }),
-        })
+            body: JSON.stringify({ newUsername: newEmail }),
+        });
+        if (!resp.ok) throw new Error("Failed to update username in backend");
 
-        if (!response.ok) {
-            throw new Error("Failed to update username in backend")
-        }
-
-        return response.json()
+        return resp.json();
     }
 
     async updatePassword(newPassword: string): Promise<any> {

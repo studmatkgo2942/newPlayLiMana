@@ -69,7 +69,7 @@ const PlayLiManaProfileService: React.FC = () => {
         }
 
         if (newPassword.length < 6) {
-            showMessage("error", "Password must be at least 6 characters long.")
+            showMessage("error", "Password must be at least 12 characters long.")
             return
         }
 
@@ -313,7 +313,7 @@ const PlayLiManaProfileService: React.FC = () => {
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     className="password-input"
-                                    placeholder="Enter new password (min 6 characters)"
+                                    placeholder="Enter new password (min 12 characters)"
                                 />
                             </div>
                             <div className="form-group">

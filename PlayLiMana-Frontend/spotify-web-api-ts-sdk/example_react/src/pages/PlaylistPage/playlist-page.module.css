@@ -211,6 +211,7 @@
       background: none;
       font-size: 16px;
       cursor: pointer;
+      color      : var(--text-primary);
       transform-origin: center;
       transition: transform 0.3s ease;
     }

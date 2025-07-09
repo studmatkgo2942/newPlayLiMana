@@ -3,6 +3,9 @@ import { createContext, useContext, useState, useEffect, useRef, type MutableRef
 import type { UserProfile } from "@spotify/web-api-ts-sdk"
 import { SpotifyContext } from "./SpotifyContext.tsx"
 import type { PropsWithChildren } from "react"
+import {Song} from "../models/song.ts";
+import {AudiusService} from "../services/audius/AudiusService.ts";
+import { useAudiusContext } from "../context/AudiusContext";
 
 export const skipEndedClearRef: MutableRefObject<boolean> = { current: false };
 
@@ -51,6 +54,14 @@ interface PlaybackContextState {
     setIsPremium: (premium: boolean | null) => void
     // New method to pause Spotify when playing other audio
     pauseSpotifyPlayback: () => Promise<void>
+    pauseCustomAudio: () => void;
+    resumeCustomAudio: () => Promise<void>;
+    audiusQueue: Song[];
+    queueIndex : number;
+    queueNext  : () => void;
+    queuePrev  : () => void;
+    clearQueue : () => void;
+    loadAudiusQueue: (tracks: Song[]) => void;
 }
 
 // Create the context
@@ -77,17 +88,118 @@ const PlaybackProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     const regularSdk = spotifyCtx?.sdk
     const isAuthenticated = spotifyCtx?.isAuthenticated
 
+    const [audiusQueue, setAudiusQueue] = useState<Song[]>([]);
+    const [queueIndex , setQueueIndex ] = useState<number>(-1);
+    const { audiusService } = useAudiusContext();
+
+    const buildAudiusStreamUrl = (
+        song: Song,
+        audiusService?: AudiusService | null    //  ← accept null **and** undefined
+    ): string | null => {
+        /* 1) prefer the direct /stream link that is already on the Song object */
+        let url = song.linksForWebPlayer?.find(u => u.includes("/stream")) ?? null;
+
+        /* 2) otherwise derive it from the public permalink */
+        if (!url && audiusService) {
+            url = audiusService.getStreamUrlFromPermalink(song.linksForWebPlayer?.[0] ?? "");
+        }
+        if (!url) return null;
+
+        /* 3) normalise – no spaces & always ?format=mp3 */
+        url = url.replace(/\s+/g, "");
+        if (!/[\?&]format=mp3\b/.test(url)) {
+            url += (url.includes("?") ? "&" : "?") + "format=mp3";
+        }
+        return url;
+    };
+
+
+    const clearQueue = () => {
+        setAudiusQueue([]);
+        setQueueIndex(-1);
+    };
+
+    const playQueueIndex = (i: number) => {
+        const song = audiusQueue[i];
+        if (!song) return;
+        //const url  = audiusService?.getStreamUrlFromPermalink(song.linksForWebPlayer?.[0]);
+        //if (!url) return;
+
+
+        let url: string | null = song.linksForWebPlayer?.find(u => u.includes("/stream")) ?? null;
+
+        if (url) {
+            // strip whitespace & force format=mp3
+            url = url.replace(/\s+/g, "");
+            if (!/[\?&]format=mp3\b/.test(url)) {
+                url += (url.includes("?") ? "&" : "?") + "format=mp3";
+            }
+        } else {
+            /* fall-back: derive from permalink via the service helper */
+            url = audiusService?.getStreamUrlFromPermalink(song.linksForWebPlayer?.[0]) ?? null;
+        }
+        if (!url) return;
+
+        playCustomAudio(url, {
+            title   : song.title,
+            imageUrl: song.coverUrl,
+            source  : "audius",
+        });
+        setQueueIndex(i);
+    };
+
+    const queueNext = () => {
+        if (queueIndex + 1 < audiusQueue.length) skipEndedClearRef.current = true, playQueueIndex(queueIndex + 1);
+    };
+    const queuePrev = () => {
+        if (queueIndex > 0) playQueueIndex(queueIndex - 1);
+    };
+
     // Method to pause Spotify playback when playing other audio
     const pauseSpotifyPlayback = async (): Promise<void> => {
-        if (player && currentState && !currentState.paused) {
-            try {
-                console.log("Pausing Spotify playback for external audio")
-                await player.pause()
-            } catch (error) {
-                console.error("Error pausing Spotify:", error)
+        // if (player && currentState && !currentState.paused) {
+        //     try {
+        //         console.log("Pausing Spotify playback for external audio")
+        //         await player.pause()
+        //     } catch (error) {
+        //         console.error("Error pausing Spotify:", error)
+        //     }
+        // }
+        try {
+            if (player && !currentState?.paused) {
+                await player.pause();                     // Web-Playback SDK
             }
+            if (regularSdk && deviceId) {
+                await regularSdk.player.pausePlayback(deviceId); // Web API (extra safety)
+            }
+        } catch (err) {
+            console.error("Error pausing Spotify:", err);
         }
     }
+
+    const pauseCustomAudio = () => {
+        const a = customAudioRef.current;
+        if (a && !a.paused) a.pause();
+    };
+
+    const resumeCustomAudio = async () => {
+        const a = customAudioRef.current;
+        if (a && a.paused) {
+            await a.play().catch((e) => console.error("resume play failed", e));
+            setIsCustomAudioPlaying(true);
+            setCurrentState((s) => (s ? { ...s, paused: false } : s));
+        }
+    };
+
+    const loadAudiusQueue = (tracks: Song[]) => {
+        if (!tracks.length) return;
+        setAudiusQueue(tracks);
+        const first = tracks[0];
+        const url   = buildAudiusStreamUrl(first, audiusService);
+        if (!url) return;
+        playCustomAudio(url, {title: first.title, imageUrl: first.coverUrl, source: "audius",});
+        setQueueIndex(0);
+    };
 
     /* inside PlaybackContext.tsx ------------------------------------------ */
     const playCustomAudio = async (url: string, trackInfo: CustomTrackInfo) => {
@@ -176,11 +288,14 @@ const PlaybackProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
         const handleEnded = () => {
             /* ▸▸ keep state when a playlist chains to the next track */
-            if (skipEndedClearRef.current) {
-                skipEndedClearRef.current = false;          // reset for next round
-                console.log("Custom audio ended – chaining, state kept");
-                return;
-            }
+            // if (skipEndedClearRef.current) {
+            //     skipEndedClearRef.current = false;          // reset for next round
+            //     console.log("Custom audio ended – chaining, state kept");
+            //     return;
+            // }
+
+            queueNext();
+            if (queueIndex + 1 >= audiusQueue.length) clearQueue();
             /* normal single-track end: wipe state */
             setIsCustomAudioPlaying(false);
             setCustomTrackInfo(null);
@@ -325,14 +440,23 @@ const PlaybackProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
                         console.log(`%c[${timestamp}]   └─ Full State Object:`, "color: blue", JSON.parse(JSON.stringify(state)))
 
                         // Clear custom audio state when Spotify starts playing
-                        if (!state.paused && customTrackInfo) {
-                            console.log("Spotify started playing, clearing custom audio state")
-                            setCustomTrackInfo(null)
-                            setIsCustomAudioPlaying(false)
-                            if (customAudioRef.current) {
-                                customAudioRef.current.pause()
-                                customAudioRef.current.src = ""
+                        //if (!state.paused && customTrackInfo) {
+                            // console.log("Spotify started playing, clearing custom audio state")
+                            // setCustomTrackInfo(null)
+                            // setIsCustomAudioPlaying(false)
+                            // if (customAudioRef.current) {
+                            //     customAudioRef.current.pause()
+                            //     customAudioRef.current.src = ""
+                            // }
+                            //stopCustomAudio();
+                            //clearQueue();
+                        //}
+                        if (!state.paused) {
+                            if (!customAudioRef.current?.paused) {
+                                customAudioRef.current.pause();
                             }
+                            stopCustomAudio();
+                            clearQueue();
                         }
                     } else {
                         console.log(`%c[${timestamp}]   └─ State is null`, "color: blue")
@@ -393,6 +517,14 @@ const PlaybackProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
                 customAudioRef,
                 isCustomAudioPlaying,
                 customTrackInfo,
+                pauseCustomAudio,
+                resumeCustomAudio,
+                audiusQueue,
+                queueIndex,
+                queueNext,
+                queuePrev,
+                clearQueue,
+                loadAudiusQueue,
                 // Setters for compatibility
                 setCurrentState,
                 setIsPlayerReady,

@@ -31,7 +31,7 @@ const SearchPage: React.FC = () => {
 
     // Context hooks
     const { sdk, isAuthenticated: isSpotifyAuthenticated } = useSpotifyContext()
-    const { deviceId, isPlayerReady, isPremium, playCustomAudio, stopCustomAudio } = usePlayback()
+    const { deviceId, isPlayerReady, isPremium, playCustomAudio, stopCustomAudio, clearQueue } = usePlayback()
     const {
         searchTerm,
         setSearchTerm,
@@ -224,6 +224,7 @@ const SearchPage: React.FC = () => {
         if (item.type === "Track" && item.previewUrl) {
             console.log(`Playing preview through MusicController... URL: ${item.previewUrl}`)
             // Use the custom audio playback method
+            clearQueue();
             playCustomAudio(item.previewUrl, {
                 title: item.title,
                 imageUrl: item.imageUrl,

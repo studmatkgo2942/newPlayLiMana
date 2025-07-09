@@ -32,7 +32,9 @@ const AudiusProfileService: React.FC = () => {
 
         // Access nested user data properly
         const userData = user.data || user
-        const userId = userData.userId?.toString() || userData.id?.toString()
+
+        const userId = userData.userId?.toString() || userData.id?.toString()      ||  (userData as any).user_id?.toString() || userData.sub?.toString()     ||   undefined;
+        //const userId = userData.userId?.toString() || userData.id?.toString()
 
         if (!userId) {
             console.log("No user ID found for Audius user")
@@ -179,7 +181,7 @@ const AudiusProfileService: React.FC = () => {
 
     // Get user data properly
     const userData = user.data || user
-    const userId = userData.userId?.toString() || userData.id?.toString()
+    const userId = userData.userId?.toString() || userData.id?.toString()  ||  (userData as any).user_id?.toString() || userData.sub?.toString()     ||   undefined;
     const userEmail = userData.email || ""
 
     return (

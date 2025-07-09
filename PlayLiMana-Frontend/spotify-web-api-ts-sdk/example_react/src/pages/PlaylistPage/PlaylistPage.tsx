@@ -19,7 +19,7 @@ const PlaylistPage = () => {
     const {id} = useParams();
     const playlistId = id ? +id : null;
     const {sdk} = useSpotifyContext()
-    const {deviceId, playCustomAudio, stopCustomAudio, customAudioRef} = usePlayback()
+    const {deviceId, playCustomAudio, stopCustomAudio, customAudioRef, loadAudiusQueue, clearQueue} = usePlayback()
     const [selectedSortCriterion, setSelectedSortCriterion] = useState('CUSTOM');
     const [isAscending, setIsAscending] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -106,58 +106,62 @@ const PlaylistPage = () => {
         setMenuOpen(prev => !prev);
     };
 
-
-
     /** Sequentially play a list of Audius tracks using the custom player. */
+    // const playAudiusPlaylist = (tracks: Song[]) => {
+    //     if (!tracks.length || !audiusService) return;
+    //
+    //     let idx = 0;
+    //     const audioEl = customAudioRef.current;   // from usePlayback()
+    //
+    //     /* ---------- choose best stream for ONE track ------------------------- */
+    //     const pickStreamUrl = (song: Song): string | null => {
+    //         // 1) stored ".../stream" url?
+    //         let url = song.linksForWebPlayer?.find(u => u.includes("/stream"));
+    //         if (url) {
+    //             if (!/[\?&]format=/.test(url)) {
+    //                 url += (url.includes("?") ? "&" : "?") + "format=mp3";
+    //             }
+    //             return url;
+    //         }
+    //         // 2) derive from permalink (already adds format=mp3)
+    //         return audiusService.getStreamUrlFromPermalink(song.linksForWebPlayer?.[0]) ?? null;
+    //     };
+    //
+    //     /* ---------- play i-th track ----------------------------------------- */
+    //     const playIdx = (i: number) => {
+    //         const url = pickStreamUrl(tracks[i]);
+    //         if (!url) return;
+    //         /* all pause/await logic is inside playCustomAudio */
+    //         playCustomAudio(url, {
+    //             title   : tracks[i].title,
+    //             imageUrl: tracks[i].coverUrl,
+    //             source  : "audius",
+    //         });
+    //     };
+    //
+    //     /* ---------- jump to the next track ---------------------------------- */
+    //     const handleEnded = () => {
+    //         idx += 1;
+    //         if (idx < tracks.length) {
+    //             skipEndedClearRef.current = true;   // tell context to keep state
+    //             playIdx(idx);
+    //         } else {
+    //             audioEl?.removeEventListener("ended", handleEnded);
+    //         }
+    //     };
+    //
+    //     /* make sure we register only once */
+    //     audioEl?.removeEventListener("ended", handleEnded);
+    //     audioEl?.addEventListener("ended", handleEnded);
+    //
+    //     playIdx(idx);                            // kick off with track 0
+    // };
+
     const playAudiusPlaylist = (tracks: Song[]) => {
-        if (!tracks.length || !audiusService) return;
-
-        let idx = 0;
-        const audioEl = customAudioRef.current;   // from usePlayback()
-
-        /* ---------- choose best stream for ONE track ------------------------- */
-        const pickStreamUrl = (song: Song): string | null => {
-            // 1) stored ".../stream" url?
-            let url = song.linksForWebPlayer?.find(u => u.includes("/stream"));
-            if (url) {
-                if (!/[\?&]format=/.test(url)) {
-                    url += (url.includes("?") ? "&" : "?") + "format=mp3";
-                }
-                return url;
-            }
-            // 2) derive from permalink (already adds format=mp3)
-            return audiusService.getStreamUrlFromPermalink(song.linksForWebPlayer?.[0]) ?? null;
+            stopCustomAudio();     // kill current Audius playback
+            clearQueue();          // drop old queue
+            loadAudiusQueue(tracks);
         };
-
-        /* ---------- play i-th track ----------------------------------------- */
-        const playIdx = (i: number) => {
-            const url = pickStreamUrl(tracks[i]);
-            if (!url) return;
-            /* all pause/await logic is inside playCustomAudio */
-            playCustomAudio(url, {
-                title   : tracks[i].title,
-                imageUrl: tracks[i].coverUrl,
-                source  : "audius",
-            });
-        };
-
-        /* ---------- jump to the next track ---------------------------------- */
-        const handleEnded = () => {
-            idx += 1;
-            if (idx < tracks.length) {
-                skipEndedClearRef.current = true;   // tell context to keep state
-                playIdx(idx);
-            } else {
-                audioEl?.removeEventListener("ended", handleEnded);
-            }
-        };
-
-        /* make sure we register only once */
-        audioEl?.removeEventListener("ended", handleEnded);
-        audioEl?.addEventListener("ended", handleEnded);
-
-        playIdx(idx);                            // kick off with track 0
-    };
 
     const playPlayList = async () => {
         if (!playlist) return;
