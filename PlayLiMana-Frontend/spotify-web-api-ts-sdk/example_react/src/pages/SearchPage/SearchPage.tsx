@@ -7,6 +7,7 @@ import { useSpotifyContext } from "../../context/SpotifyContext"
 import { useEnhancedSearch } from "../../context/EnhancedSearchContext"
 import { usePlayback } from "../../context/PlaybackContext"
 import { useSpotifyAuthPrompt } from "../../hooks/UseSpotifyAuthPrompt"
+import { useAudiusContext } from "../../context/AudiusContext";
 
 // UI Components
 import { SpotifyAuthModal } from "../../components/ui/modals/SpotifyAuthModal"
@@ -25,13 +26,14 @@ import {
 } from "../../components/types/search"
 
 import "./SearchPage.css"
+import {Song} from "../../models/song.ts";
 
 const SearchPage: React.FC = () => {
     const { query } = useParams<{ query: string }>()
 
     // Context hooks
     const { sdk, isAuthenticated: isSpotifyAuthenticated } = useSpotifyContext()
-    const { deviceId, isPlayerReady, isPremium, playCustomAudio, stopCustomAudio, clearQueue } = usePlayback()
+    const { deviceId, isPlayerReady, isPremium, playCustomAudio, stopCustomAudio, clearQueue, loadAudiusQueue } = usePlayback()
     const {
         searchTerm,
         setSearchTerm,
@@ -43,6 +45,7 @@ const SearchPage: React.FC = () => {
     } = useEnhancedSearch()
     const { isModalOpen, currentFeature, promptForSpotifyAuth, handleConfirmAuth, handleCloseModal } =
         useSpotifyAuthPrompt()
+    const { audiusService } = useAudiusContext();
 
     // Local state
     const [selectedTrackForPreview, setSelectedTrackForPreview] = useState<SelectedTrackInfo | null>(null)
@@ -231,6 +234,51 @@ const SearchPage: React.FC = () => {
                 source: item.source,
             })
             return
+        }
+
+        if (
+            item.source === "audius" &&
+            item.type   === "Album"   &&           // Audius “playlist” is mapped as Album
+            item.audiusPlaylistId &&
+            audiusService
+        ) {
+            try {
+                const tracks = await audiusService.getPlaylistTracks(item.audiusPlaylistId);
+                if (tracks.length === 0) {
+                    console.warn("Playlist contains no public tracks");
+                    return;
+                }
+
+                // convert AudiusTrack → Song (your local model) ----------------
+                const songObjs: Song[] = tracks.map(t => ({
+                    songId : Number(t.id),                                      // number, not string
+                    title  : t.title,
+                    artists: t.user.name ?? "Unknown",                          // ← removed stray comma
+                    coverUrl: t.artwork?.["480x480"] || t.artwork?.["150x150"] || "",
+                    playtime: t.duration * 1000,                                // ms
+
+                    // whatever URL you’ll later turn into the MP3 stream
+                    linksForWebPlayer: [
+                        t.streamUrl                                   // already an “…/stream?…” URL
+                        ?? audiusService.getStreamUrl(t.id),        // fallback: build one
+                        t.permalink ?? ""                             // keep the permalink as 2nd entry
+                    ].filter(Boolean),
+
+                    // satisfy the Song interface
+                    releaseDate: new Date(
+                        t.releaseDate ??                // if the API already gives one
+                        Date.now()                      // last-resort so the field isn’t missing
+                    ),
+                }));                     // import { Song } from "models/song"
+
+                clearQueue();                        // stop older queue
+                loadAudiusQueue(songObjs);           // hands off to PlaybackContext
+                return;                              // ← DONE
+            } catch (err) {
+                console.error("Failed to start Audius playlist playback", err);
+                setSearchError("Could not start this Audius playlist");
+                return;
+            }
         }
 
         // Fallback to external link

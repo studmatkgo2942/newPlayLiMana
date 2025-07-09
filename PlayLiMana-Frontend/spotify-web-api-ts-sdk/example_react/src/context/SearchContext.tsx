@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 
 
-import type { SearchResultDisplayItem } from '../components/features/music/MainPageSpotify.tsx';
+import type { SearchResultDisplayItem } from '../components/types/search.ts';
 import { Artist, Track, SimplifiedAlbum } from "@spotify/web-api-ts-sdk";
 import {useSpotifyContext} from "./SpotifyContext.tsx";
 

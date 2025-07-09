@@ -5,7 +5,7 @@ export interface Song {
   album?: string;
   genres?: string[];
   playtime: number; // Duration in seconds
-  releaseDate: Date;
+  releaseDate?: Date;
   linksForWebPlayer: string[];
   coverUrl?: string;
   positionInPlaylist?: number;

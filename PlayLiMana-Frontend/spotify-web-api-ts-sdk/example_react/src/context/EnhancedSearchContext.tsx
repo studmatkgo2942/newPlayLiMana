@@ -2,7 +2,7 @@ import type React from "react"
 import type { ReactNode } from "react"
 import { createContext, useContext, useState, type Dispatch, type SetStateAction, useEffect, useCallback } from "react"
 
-import type { SearchResultDisplayItem } from "../components/features/music/MainPageSpotify"
+import type { SearchResultDisplayItem } from "../components/types/search.ts"
 import type { Artist, Track, SimplifiedAlbum } from "@spotify/web-api-ts-sdk"
 import { useSpotifyContext } from "./SpotifyContext"
 import { useAudiusContext } from "./AudiusContext"
@@ -164,6 +164,7 @@ export const EnhancedSearchProvider: React.FC<{ children: ReactNode }> = ({ chil
                                 imageUrl: playlist.artwork?.["480x480"] || playlist.artwork?.["150x150"],
                                 externalUrl: playlist.externalUrl, // This now uses the permalink properly
                                 source: "audius",
+                                audiusPlaylistId: playlist.id,
                             })
                         })
                     } catch (audiusError) {

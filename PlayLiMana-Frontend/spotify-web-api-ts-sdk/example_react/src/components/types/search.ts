@@ -7,6 +7,7 @@ export interface SearchResultDisplayItem {
     previewUrl?: string
     uri?: string
     source?: "spotify" | "audius"
+    audiusPlaylistId?: string;
 }
 
 export interface SelectedTrackInfo {
@@ -14,6 +15,7 @@ export interface SelectedTrackInfo {
     title: string
     imageUrl?: string
     source?: "spotify" | "audius"
+    audiusPlaylistId?: string;
 }
 
 export interface GroupedResults {
