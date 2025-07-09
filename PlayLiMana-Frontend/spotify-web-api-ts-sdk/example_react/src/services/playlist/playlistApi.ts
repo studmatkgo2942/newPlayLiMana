@@ -645,3 +645,21 @@ export const importAudiusPlaylists = async (pls: AudiusPlaylistData[]): Promise<
 
   return imported
 }
+
+/** Everyone can see the public catalogue – no token required */
+export async function fetchPublicPlaylists(): Promise<Playlist[]> {
+  return fetch("/api/v1/playlists/public")
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to fetch public playlists");
+        return r.json();
+      });
+}
+
+/** Same, but for a single playlist */
+export async function fetchPublicPlaylistById(id: number): Promise<Playlist> {
+  return fetch(`/api/v1/playlists/public/${id}`)
+      .then(r => {
+        if (!r.ok) throw new Error("Playlist is private or missing");
+        return r.json();
+      });
+}

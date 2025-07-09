@@ -19,12 +19,16 @@ import SpotifyCallbackHandler from "./pages/callbacks/SpotifyCallbackHandler.tsx
 import SoundCloudCallbackHandler from "./pages/callbacks/SoundCloudCallback.tsx"
 import AudiusCallbackHandler from "./pages/callbacks/AudiusCallbackHandler.tsx"
 import { useAuth } from "./hooks/UseAuth.tsx"
+import { usePlayback } from "./context/PlaybackContext"
 
 export const AppLayout: React.FC = () => {
     // Consume the context value using the imported hook
     const { sdk, isAuthenticated, isLoading, authError } = useSpotifyContext()
     const { user: firebaseUser } = useAuth()
     const location = useLocation()
+
+    const {isCustomAudioPlaying,customTrackInfo,currentState,} = usePlayback()
+    const shouldShowController = isCustomAudioPlaying || !!customTrackInfo   || !!(currentState && currentState.track_window?.current_track)
 
     // Firebase authentication check (for general app access)
     const isFirebaseAuthenticated = !!firebaseUser
@@ -99,7 +103,7 @@ export const AppLayout: React.FC = () => {
                             <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                     </main>
-                    {isFirebaseAuthenticated && !hideNavigation && <MusicController />}
+                    {shouldShowController && !hideNavigation && <MusicController />}
                 </div>
             </EnhancedSearchProvider>
         </ThemeProvider>
