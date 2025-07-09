@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+build/
+.gradle
+node_modules
+*.log
+*.iml
+docker-compose.yml

@@ -1,0 +1,64 @@
+.profile-form {
+  max-width: 400px;
+  margin: 32px auto;
+  padding: 32px 24px;
+  background: #fafbfc;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+
+  .form-group {
+    margin-bottom: 1.7rem;
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    input {
+      width: 70%;
+      padding: 0.5rem;
+      margin-right: 0.7rem;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+      transition: border 0.2s;
+
+      &.invalid {
+        border: 1.5px solid #e24a4a;
+        background: #fff4f4;
+      }
+    }
+
+    button {
+      padding: 0.45rem 1.2rem;
+      border-radius: 5px;
+      border: 1px solid #888;
+      background: #f6f6ff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+    }
+
+    .input-error {
+      color: #e24a4a;
+      font-size: 0.94em;
+      margin-top: 4px;
+    }
+  }
+}
+
+.success {
+  color: #197b35;
+  font-weight: 500;
+  margin: 18px 0 0 0;
+}
+
+.error {
+  color: #e24a4a;
+  font-weight: 500;
+  margin: 18px 0 0 0;
+}

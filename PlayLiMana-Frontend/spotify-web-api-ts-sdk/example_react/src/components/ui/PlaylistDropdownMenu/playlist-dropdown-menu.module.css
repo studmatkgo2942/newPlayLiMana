@@ -1,0 +1,27 @@
+.menuContainer {
+  position: fixed;
+  z-index: 1000;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 8px 16px var(--shadow-color);
+  padding: 4px 0;
+  width: 80px;
+}
+
+.menuItem {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  color: var(--text-primary);
+  transition: background-color 0.2s ease;
+}
+
+.menuItem:hover {
+  background-color: var(--bg-navbar);
+}

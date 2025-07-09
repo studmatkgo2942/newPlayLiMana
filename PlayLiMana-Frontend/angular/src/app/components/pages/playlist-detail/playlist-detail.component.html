@@ -1,0 +1,72 @@
+<div *ngIf="playlist" class="playlist-detail">
+  <div class="playlist-detail">
+
+    <!-- Playlist-Card -->
+    <div class="playlist-card">
+
+      <!-- Cover -->
+      <div class="cover" [ngStyle]="{'background-image': 'url(' + playlist.coverUrl + ')'}"></div>
+
+      <!-- Buttons -->
+      <div class="actions">
+
+        <button class="btn edit" aria-label="Edit" (click)="popup.goToEditPlaylistPage(playlist!)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="edit-icon">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+            <path d="m15 5 4 4" />
+          </svg>
+        </button>
+
+        <button class="btn play" aria-label="Play">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="play-icon">
+            <polygon points="6 3 20 12 6 21 6 3" />
+          </svg>
+        </button>
+
+        <button class="btn more" aria-label="More">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="more-icon">
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="12" cy="5" r="1" />
+            <circle cx="12" cy="19" r="1" />
+          </svg>
+        </button>
+
+      </div>
+      <div class="info" *ngIf="playlist">
+        <h2 class="playlist-name">{{ playlist.playlistName }}</h2>
+        <p class="visibility">{{ playlist.visibility }} Playlist</p>
+        <p class="stats">{{ playlist.numberOfSongs }} songs, {{ playlist.playtime | duration}}</p>
+        <p *ngIf="playlist.description" class="description">{{ playlist.description }}</p>
+      </div>
+    </div>
+
+    <!-- Songs List -->
+    <div class="songs-section">
+
+      <!-- Sorting Dropdown -->
+      <div class="sort-menu">
+        <select class="sort-dropdown" [value]="selectedSortCriterion" (change)="onSortSelectionChange($event)">
+          <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+        <button class="order-toggle" aria-label="Descending" (click)="toggleSortingOrder()">↓</button>
+      </div>
+
+      <!-- Songs Cards -->
+      <div class="song-list">
+        <app-song-card [songs]="playlist.songs"></app-song-card>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Playlist Popup -->
+  <app-playlist-popup #popup (playlistCreated)="saveChanges()"></app-playlist-popup>
+</div>
+
+<!-- No Playlist -->
+<div *ngIf="!playlist && errorMessage" class="error-message">
+  <div class="error-content">
+    <h2>Error {{errorStatusCode}}</h2>
+    <p>{{ errorMessage }}</p>
+  </div>
+</div>

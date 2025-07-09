@@ -1,0 +1,540 @@
+/* --- Main Controller Bar --- */
+.music-controller {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: var(--bg-controller);
+    color: var(--text-primary);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    z-index: 1000;
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- Grid Column Sections --- */
+.controller-section-left { /* Current Track */
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    justify-self: start;
+    justify-content: flex-start;
+    gap: 0.75rem;
+}
+
+.controller-section-center { /* Buttons + Progress */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    gap: 0.25rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.controller-section-right { /* Volume + Up Next */
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    justify-self: end;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* --- Current Track Styles --- */
+.controller-track-image {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.controller-track-image-placeholder {
+    width: 45px;
+    height: 45px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.current-track-service-logo {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    align-self: center; /* No filter needed */
+}
+
+.controller-track-details {
+    overflow: hidden;
+    flex-grow: 1;
+    flex-basis: auto;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.controller-track-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.controller-track-artist {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 2px 0 0 0;
+}
+
+/* --- Control Button Group Styles --- */
+.controller-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Adjust gap between all buttons in the center */
+}
+
+/* Base styles for ALL icon buttons (like shuffle, repeat, etc.) */
+.controller-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary); /* Default icon color */
+    cursor: pointer;
+    padding: 0; /* Remove padding if using fixed size */
+    font-size: 0.9rem; /* Affects text buttons */
+    line-height: 1;
+    border-radius: 50%; /* Circular background for hover */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Needed for the ::after dot */
+    width: 36px; /* Consistent size for icon buttons */
+    height: 36px;
+    transition: color 0.2s ease, background-color 0.2s ease; /* Smooth transitions */
+}
+.controller-button:hover:not(:disabled) {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle hover background */
+}
+.controller-button:disabled {
+    color: var(--text-secondary); /* Use text-secondary for disabled icon color */
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent; /* Ensure no hover bg when disabled */
+}
+
+/* Keep specific styles for text-based buttons */
+.play-pause-button {
+    font-weight: bold; font-size: 1rem; min-width: 80px;
+    /* Override some icon button styles */
+    width: auto; height: auto; border-radius: 5px; padding: 0.5rem 0.8rem;
+}
+.play-pause-button:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.play-pause-button {
+    font-weight: bold;
+    font-size: 1rem;
+    min-width: 80px;
+    /* Overrides for text button */
+    width: auto;
+    height: auto;
+    border-radius: 5px;
+    padding: 0.5rem 0.8rem;
+}
+
+/* --- Icon Styling within Buttons --- */
+.control-icon {
+    width: 18px;  /* Explicit size */
+    height: 18px;
+    display: block;
+}
+
+/* --- Specific Button Styles (e.g., Shuffle) --- */
+.shuffle-button {
+    /* Inherits .controller-button sizing */
+}
+
+/* Active state for shuffle button */
+.shuffle-button.active {
+    /* Change the button's color property to Spotify green */
+    /* The .control-icon inside will inherit this color via 'currentColor' */
+    color: var(--text-accent);
+}
+
+/* Green indicator dot below the active shuffle button */
+.shuffle-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;      /* Position dot below icon (adjust px value) */
+    left: 50%;        /* Center dot horizontally */
+    transform: translateX(-50%);
+    width: 4px;       /* Dot size */
+    height: 4px;
+    background-color: var(--text-accent); /* Dot color */
+    border-radius: 50%; /* Make it round */
+    display: block;
+}
+
+/* Commented out filter approach (needed for non-SVG <img> color change) */
+
+.control-icon svg{
+    width: 18px;  /* Set desired icon size */
+    height: 18px;
+    display: block; /* Helps prevent extra space */
+    /* These make the SVG inherit the button's text color */
+    fill: currentColor;
+    stroke: currentColor; /* Include stroke if your SVG uses strokes */
+}
+
+/* --- Progress Bar Styles --- */
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px; /* Max width for the central progress element */
+    gap: 0.5rem;
+    height: 16px; /* Height allocated for time + bar */
+    margin-top: 2px; /* Small space above progress */
+    justify-content: center;
+}
+
+.progress-time {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    min-width: 30px; /* Ensure time doesn't wrap */
+    text-align: center;
+    line-height: 1; /* Match height better */
+    flex-shrink: 0;
+}
+
+.progress-time.current {
+    text-align: right;
+}
+
+.progress-time.duration {
+    text-align: left;
+}
+
+/* Wrapper for the clickable progress bar itself */
+.progress-bar-wrapper {
+    flex-grow: 1; /* Allows bar to take remaining space */
+    max-width: 250px; /* Absolute max width for bar track */
+    height: 10px; /* Clickable area height */
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+
+.progress-bar-background {
+    width: 100%; /* Take full width of wrapper */
+    height: 4px;
+    background-color: var(--text-secondary);
+    opacity: 0.5;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative; /* For foreground positioning */
+}
+
+.progress-bar-foreground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--text-secondary);
+    opacity: 0.9;
+    border-radius: 2px;
+    /* transition: width 0.1s linear; */ /* Add if needed, but can feel laggy */
+    pointer-events: none; /* Allow clicks to go to background */
+
+}
+
+/* Hover effect on the wrapper/background */
+.progress-bar-wrapper:hover .progress-bar-foreground {
+    background-color: var(--text-accent);
+}
+
+.progress-bar-wrapper:hover .progress-bar-background {
+    opacity: 0.7; /* Slightly increase background opacity on hover */
+}
+
+
+/* --- Volume Control Styles --- */
+.volume-control-mc {
+    display: flex;
+    align-items: center;
+    order: 1; /* Position volume first in the right section */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.volume-icon-mc {
+    margin-right: 0.5rem;
+    color: var(--text-secondary);
+    cursor: default; /* Icon itself isn't interactive */
+    /* Add size if needed, e.g.: */
+    /* width: 18px; height: 18px; */
+    /* display: flex; align-items: center; */
+}
+
+.volume-slider-mc {
+    cursor: pointer;
+    width: 80px; /* Adjust width as needed */
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px; /* Track height */
+    background: var(--text-secondary); /* Track background */
+    opacity: 0.5;
+    border-radius: 2px;
+    outline: none;
+    transition: opacity 0.2s;
+}
+
+.volume-slider-mc:disabled {
+    cursor: not-allowed;
+    opacity: 0.5; /* Keep some visibility */
+}
+
+/* Webkit (Chrome, Safari, Edge) Thumb */
+.volume-slider-mc::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px; /* Thumb size */
+    height: 12px;
+    background: var(--text-secondary); /* Thumb color */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.volume-slider-mc:hover::-webkit-slider-thumb {
+    background: var(--text-primary); /* Thumb hover color */
+}
+
+.volume-slider-mc:disabled::-webkit-slider-thumb {
+    background: #535353; /* Disabled thumb color */
+    cursor: not-allowed;
+}
+
+/* Firefox Thumb */
+.volume-slider-mc::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none; /* Important for Firefox */
+    transition: background-color 0.2s ease;
+}
+
+.volume-slider-mc:hover::-moz-range-thumb {
+    background: var(--text-primary);
+}
+
+.volume-slider-mc:disabled::-moz-range-thumb {
+    background: #535353;
+    cursor: not-allowed;
+}
+
+/* Firefox Track Styling (Optional - often defaults look fine) */
+/*
+.volume-slider-mc::-moz-range-track {
+    background: var(--text-secondary);
+    opacity: 0.5;
+    height: 4px;
+    border-radius: 2px;
+}
+*/
+
+
+/* --- Up Next Styles --- */
+.up-next-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0; /* Allow shrinking */
+    order: 2; /* Position 'up next' after volume */
+    flex-shrink: 1; /* Allow shrinking more readily than volume */
+    overflow: hidden; /* Hide overflow */
+}
+
+.up-next-service-logo {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0; /* Removed filter */
+}
+
+.up-next-details {
+    overflow: hidden; /* Clip text */
+    text-align: right;
+    flex-shrink: 1; /* Allow details to shrink */
+}
+
+.up-next-label {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.up-next-name {
+    font-size: 0.8rem;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    color: var(--text-secondary); /* Dimmer than current track */
+    display: block; /* Ensure it takes block space */
+}
+
+.up-next-image {
+    width: 40px; /* Slightly smaller than main track */
+    height: 40px;
+    object-fit: cover;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.up-next-image-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #666;
+}
+
+/* Optional: Placeholder to prevent layout shift if Up Next sometimes disappears */
+.up-next-placeholder {
+    width: auto;
+    min-width: calc(16px + 40px + 0.75rem); /* Approx width of logo + image + gap */
+    height: 40px; /* Match image height */
+    flex-shrink: 0;
+    visibility: hidden; /* Takes up space but isn't visible */
+}
+
+
+/* --- Controller Responsive --- */
+@media (max-width: 900px) {
+    .up-next-group {
+        display: none; /* Hide 'Up Next' completely */
+    }
+
+    .controller-section-right {
+        justify-content: flex-end; /* Ensure volume stays right */
+        min-width: auto; /* Allow right section to shrink */
+    }
+}
+
+@media (max-width: 768px) {
+    .volume-control-mc {
+        display: none; /* Hide volume control */
+    }
+
+    .progress-bar-container {
+        max-width: 90%; /* Allow progress bar to take more width */
+    }
+
+    .controller-section-left {
+        /* Keep left section visible longer based on previous comment, hide if needed */
+        /* display: none; */
+        flex-grow: 0; /* Don't allow it to grow */
+        flex-shrink: 1; /* Allow it to shrink */
+        overflow: hidden; /* Hide overflow quickly */
+    }
+
+    .controller-track-artist {
+        display: none; /* Hide artist name earlier */
+    }
+
+    .music-controller {
+        /* Adjust grid slightly if needed, or keep 1fr auto 1fr */
+        gap: 0.5rem; /* Reduce gap */
+        padding: 0 0.5rem; /* Reduce padding */
+    }
+}
+
+@media (max-width: 600px) {
+    /* Added breakpoint for smoother transition */
+    .controller-section-left {
+        display: none; /* Hide current track info */
+    }
+
+    .music-controller {
+        grid-template-columns: 1fr; /* Center controls take full width */
+        justify-content: center;
+    }
+
+    .controller-section-center {
+        justify-self: center; /* Ensure centered */
+        width: auto; /* Allow natural width */
+        max-width: none; /* Remove max width */
+    }
+
+    .controller-section-right {
+        display: none; /* Hide right section (already empty) */
+    }
+
+    .progress-bar-container {
+        width: 90%; /* Use percentage width */
+        max-width: 400px; /* Add back a max-width */
+    }
+
+    .progress-bar-wrapper {
+        max-width: none; /* Remove fixed width for bar */
+    }
+}
+
+
+@media (max-width: 480px) {
+    /* Styles already applied at 600px might be sufficient */
+    /* Further fine-tuning if needed */
+    .controller-buttons {
+        gap: 0.25rem; /* Further reduce button gap */
+    }
+
+    .controller-button {
+        padding: 0.3rem; /* Reduce padding inside buttons */
+        width: 32px; /* Slightly smaller buttons */
+        height: 32px;
+    }
+
+    .control-icon {
+        width: 18px; /* Smaller icons */
+        height: 18px;
+    }
+
+    .play-pause-button {
+        min-width: 60px; /* Smaller play/pause */
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .progress-time {
+        font-size: 0.65rem; /* Smaller time font */
+        min-width: 25px;
+    }
+}

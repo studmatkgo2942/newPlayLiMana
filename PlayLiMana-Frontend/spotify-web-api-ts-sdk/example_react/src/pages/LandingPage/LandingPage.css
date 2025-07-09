@@ -1,0 +1,105 @@
+/* Landing Page CSS using app light/dark mode variables */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.playlist-grid {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1rem;
+    align-items: start;
+    max-width: 800px;
+    width: 100%;
+}
+
+.landing-container {
+    max-width: 800px;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+}
+
+.landing-title {
+    font-size: 3.2rem;
+    font-weight: 900;
+    margin-bottom: 1.25rem;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.landing-subtitle {
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+}
+
+.landing-button {
+    background-color: var(--text-accent);
+    color: var(--bg-primary);
+    border: none;
+    padding: 0.9rem 2.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-radius: 35px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 14px var(--shadow-color);
+}
+
+.landing-button:hover,
+.landing-button:focus {
+    background-color: var(--text-accent-darker);
+    outline: none;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px var(--shadow-color);
+}
+
+footer {
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+    letter-spacing: 0.02em;
+}
+
+.dark-mode-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    font-weight: 600;
+}
+
+.dark-mode-toggle:hover {
+    background-color: var(--text-accent);
+    color: var(--bg-primary);
+    box-shadow: 0 4px 14px var(--shadow-color);
+}

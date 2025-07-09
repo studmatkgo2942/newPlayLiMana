@@ -1,0 +1,39 @@
+.search-prompt {
+    text-align: left;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.search-prompt p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+    text-align: left;
+}
+
+.no-results {
+    text-align: left;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.no-results p {
+    margin: 0.5rem 0;
+    text-align: left;
+}
+
+.loading-text {
+    text-align: left;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.error-message {
+    text-align: left;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+}

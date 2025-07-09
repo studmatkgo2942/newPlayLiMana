@@ -1,0 +1,172 @@
+.navbar {
+    background-color: #f4f4f4;//#333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2.5rem;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    justify-self: start; /* Align section to start of grid cell */
+    gap: 2rem;
+    min-width: 0;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700; /* Bolder */
+    color: #000000;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.navbar-brand:hover {
+    color: #1db954; /* Spotify green */
+}
+
+.navbar-links {
+    display: flex;
+    gap: 1.5rem; /* Spacing between links */
+}
+
+.navbar-link {
+    color: #b3b3b3; /* Grey for inactive links */
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+    color: #ffffff; /* White on hover */
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    justify-self: end; /* Align section to end of grid cell */
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Space between name and image/initials */
+    text-decoration: none;
+    color: #000000;
+    padding: 0.25rem; /* Minimal padding around */
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    max-width: 200px; /* Prevent name from getting too long */
+}
+
+.profile-section:hover {
+    //background-color: rgba(255, 255, 255, 0.1); /* Subtle hover */
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.profile-name {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ... for long names */
+}
+
+.profile-image,
+.profile-initials,
+.profile-section-anon {
+    width: 32px; /* Consistent size */
+    height: 32px;
+    border-radius: 50%; /* Circular */
+    flex-shrink: 0; /* Prevent shrinking */
+    display: flex; /* Used for centering initials */
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background-color: #535353; /* Default background */
+    color: #ffffff;
+    font-size: 0.8rem; /* For initials */
+    overflow: hidden; /* Ensure image doesn't break bounds */
+}
+
+.profile-image {
+    object-fit: cover; /* Ensure image covers the circle */
+    background-color: transparent; /* Override default bg if image loads */
+}
+
+.profile-loading {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+    padding: 0 0.5rem; /* Match spacing */
+}
+
+.navbar-center {
+    display: flex;
+    justify-content: center;
+    justify-self: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.navbar-search-input {
+    width: 100%;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid #000;//transparent;
+    background-color: #ffffff;
+    color: #000000;//#333;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.navbar-search-input:focus {
+    background-color: #ffffff;//#535353;
+    //border-color: #000;//#777;
+    border: 2px solid #000;
+}
+
+/* Basic responsiveness */
+@media (max-width: 768px) {
+    .navbar-links {
+        display: none;
+    }
+
+    .navbar-center {
+        max-width: 300px;
+    }
+
+    /* Adjust search width */
+    .navbar {
+        gap: 0.5rem;
+        padding: 0 1rem;
+    }
+
+    /* Reduce gap/padding */
+}
+
+@media (max-width: 480px) {
+    .navbar-brand {
+        display: none;
+    }
+
+    .navbar-center {
+        max-width: none;
+    }
+
+    .profile-name {
+        display: none;
+    }
+
+    .navbar {
+        padding: 0 0.5rem;
+    }
+}

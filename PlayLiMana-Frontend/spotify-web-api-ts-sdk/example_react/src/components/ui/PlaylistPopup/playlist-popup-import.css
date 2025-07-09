@@ -1,0 +1,370 @@
+/* Spotify Playlist Import Popup Styles (popupPage = 4) */
+
+/* Loading Container */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+}
+
+.loadingContainer p {
+    color: var(--text-secondary, #666);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Error Message for Import */
+.errorMessage {
+    padding: 1rem;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    color: #dc2626;
+    text-align: center;
+}
+
+.errorMessage p {
+    margin: 0 0 1rem 0;
+}
+
+.retryButton {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.retryButton:hover {
+    background-color: #b91c1c;
+}
+
+/* No Playlists State */
+.noPlaylists {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary, #666);
+}
+
+.noPlaylists p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Playlists List Container */
+.playlistsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 100%;
+}
+
+.instructionText {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary, #333);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Scrollable Playlists Container */
+.playlistsContainer {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background-color: var(--bg-primary, #fff);
+}
+
+/* Custom Scrollbar */
+.playlistsContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlistsContainer::-webkit-scrollbar-track {
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 4px;
+}
+
+.playlistsContainer::-webkit-scrollbar-thumb {
+    background: var(--border-color, #d1d5db);
+    border-radius: 4px;
+}
+
+.playlistsContainer::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary, #9ca3af);
+}
+
+/* Individual Playlist Item */
+.playlistItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--bg-primary, #fff);
+    margin-bottom: 0.5rem;
+}
+
+.playlistItem:hover {
+    background-color: var(--bg-secondary, #f9fafb);
+    border-color: var(--border-color, #e5e7eb);
+}
+
+.playlistItem.selected {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+}
+
+.playlistItem.selected:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Playlist Checkbox */
+.playlistCheckbox {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.playlistCheckbox input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+/* Playlist Image Container */
+.playlistImage {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: var(--bg-secondary, #f3f4f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playlistImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.playlistImagePlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-secondary, #f3f4f6);
+    color: var(--text-secondary, #9ca3af);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Playlist Info */
+.playlistInfo {
+    flex: 1;
+    min-width: 0; /* Allows text truncation */
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.playlistName {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlistDetails {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlistDescription {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #9ca3af);
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Import Popup Specific Overrides */
+.popup[data-page="4"] {
+    max-width: 600px;
+    width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup[data-page="4"] .popupBody {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+}
+
+.popup[data-page="4"] .popupFooter {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    background-color: var(--bg-secondary, #f9fafb);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .popup[data-page="4"] {
+        width: 95vw;
+        max-height: 85vh;
+    }
+
+    .playlistsContainer {
+        max-height: 300px;
+    }
+
+    .playlistItem {
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .playlistImage {
+        width: 50px;
+        height: 50px;
+    }
+
+    .playlistName {
+        font-size: 0.9rem;
+    }
+
+    .playlistDetails {
+        font-size: 0.8rem;
+    }
+
+    .playlistDescription {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .popup[data-page="4"] {
+        width: 98vw;
+        max-height: 90vh;
+    }
+
+    .popup[data-page="4"] .popupBody {
+        padding: 1rem;
+    }
+
+    .popup[data-page="4"] .popupFooter {
+        padding: 0.75rem 1rem;
+    }
+
+    .playlistsContainer {
+        max-height: 250px;
+    }
+
+    .playlistItem {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .playlistImage {
+        width: 45px;
+        height: 45px;
+    }
+
+    .playlistCheckbox input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .instructionText {
+        font-size: 0.85rem;
+    }
+}
+
+/* Loading Animation */
+.loaderInner.ballClipRotate {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Focus States for Accessibility */
+.playlistItem:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.playlistCheckbox input[type="checkbox"]:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Selection Counter in Footer */
+.selectionCounter {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+    margin-right: auto;
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary, #9ca3af);
+}
+
+.emptyState h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.emptyState p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}

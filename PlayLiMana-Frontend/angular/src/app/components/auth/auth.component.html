@@ -1,0 +1,19 @@
+<div class="auth-form">
+  <h2>{{ isLogin ? 'Login' : 'Register' }}</h2>
+  <form (ngSubmit)="submit()">
+    <label>
+      Email:
+      <input [(ngModel)]="email" name="email" type="email" required />
+    </label>
+    <label>
+      Password:
+      <input [(ngModel)]="password" name="password" type="password" required minlength="8" />
+    </label>
+    <button type="submit">{{ isLogin ? 'Login' : 'Register' }}</button>
+    <button type="button" (click)="toggleMode()">
+      {{ isLogin ? 'Create Account' : 'Back to Login' }}
+    </button>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="success" class="success">{{ success }}</div>
+  </form>
+</div>

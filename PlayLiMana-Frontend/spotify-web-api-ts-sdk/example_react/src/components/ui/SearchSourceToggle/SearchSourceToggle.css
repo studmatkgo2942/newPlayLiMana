@@ -1,0 +1,118 @@
+.search-source-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+}
+
+.search-source-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.search-source-buttons {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.search-source-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border: none;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-right: 1px solid var(--border-color);
+}
+
+.search-source-btn:last-child {
+    border-right: none;
+}
+
+.search-source-btn:hover {
+    background: var(--shadow-color);
+    color: var(--text-primary);
+}
+
+.search-source-btn.active {
+    background: var(--text-accent);
+    color: white;
+}
+
+.source-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.audius-icon {
+    filter: brightness(0) invert(1);
+}
+
+.search-source-btn.active .audius-icon {
+    filter: none;
+}
+
+/* Simple Audius icon - colored circle to avoid text duplication */
+.audius-icon-simple {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #cc0fe0; /* Audius brand color */
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* Add a small musical note or A letter inside the circle */
+.audius-icon-simple::after {
+    content: "A";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 8px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* When button is active, keep the same color */
+.search-source-btn.active .audius-icon-simple {
+    background: white;
+}
+
+.search-source-btn.active .audius-icon-simple::after {
+    color: #cc0fe0;
+}
+
+@media (max-width: 768px) {
+    .search-source-toggle {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .search-source-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .source-icon,
+    .audius-icon-simple {
+        width: 12px;
+        height: 12px;
+    }
+
+    .audius-icon-simple::after {
+        font-size: 7px;
+    }
+}

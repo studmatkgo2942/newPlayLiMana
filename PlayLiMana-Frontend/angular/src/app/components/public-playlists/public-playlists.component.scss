@@ -1,0 +1,23 @@
+.playlist-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.playlist-card {
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  width: 200px;
+  text-align: center;
+}
+
+.playlist-image {
+  width: 100%;
+  height: auto;
+}
+
+.playlist-meta {
+  font-size: 0.85rem;
+  color: #666;
+}

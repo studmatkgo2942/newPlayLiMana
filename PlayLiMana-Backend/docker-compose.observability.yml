@@ -1,0 +1,59 @@
+services:
+  otel-collector:
+    #image: otel/opentelemetry-collector:latest
+    #container_name: otel-collector
+    #volumes:
+    #  - ./otel.config.yaml:/etc/otel.config.yaml
+    build:
+      context: .
+      dockerfile: Dockerfile.otel
+    container_name: otel-collector
+    command: ["--config=/etc/otel.config.yaml"]
+    ports:
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+      - "8888:8888"  # Prometheus Metrics
+    networks:
+      - playlimana_net
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/jaeger:2.7.0
+    container_name: jaeger
+    ports:
+      - "5778:5778"    # Hot-Restart
+      - "16686:16686"  # Jaeger UI
+      - "14250:14250"  # gRPC Endpoint
+      - "14268:14268"  # HTTP Endpoint
+    networks:
+      - playlimana_net
+
+  prometheus:
+    # image: prom/prometheus:latest
+    # container_name: prometheus
+    # volumes:
+    #  - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    build:
+      context: .
+      dockerfile: Dockerfile.prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - playlimana_net
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - playlimana_net
+    depends_on:
+      - prometheus
+
+networks:
+  playlimana_net:
+    name: playlimana_net
+    external: true

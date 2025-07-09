@@ -1,0 +1,225 @@
+/////* Library Header */////
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  margin-top: 2rem; // 2rem + (2 * 0.625rem) = height_navbar + padding_navbar
+}
+
+.library-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.pagination-button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+//* Sort Menu *//
+.sort-menu {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+/* Dropdown Menu */
+.sort-dropdown {
+  padding: 8px;
+  padding-right: 20px;
+  border: none;
+  border-right: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  appearance: none; // disable default drop-down arrow
+  -webkit-appearance: none;
+  -moz-appearance: none; 
+  background-image: url('/assets/hamburger.svg');
+  background-repeat: no-repeat;
+  background-position: calc(100% + 40px ) calc(100% + 28px);
+  background-size: 100px;
+}
+.sort-dropdown:hover {
+  background-color: #f4f4f4;
+}
+/* Order Toggle Button */
+.order-toggle {
+  padding: 8px 12px;
+  position: relative;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+.order-toggle.rotate {
+  transform: rotate(-180deg);
+}
+.order-toggle:hover {
+  background-color: #f4f4f4;
+}
+
+
+.library-separator {
+  border: none;
+  border-bottom: 1px solid #000;
+  margin-top: 0;
+  padding-top: 0;
+  margin-bottom: 1rem;
+}
+
+
+/////* Playlist Grid */////
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+  justify-content: space-start;
+  gap: 25px;
+}
+@media (min-width: 600px) { 
+  .playlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    justify-content: space-between;
+  }
+}
+
+//* Playlist Card *//
+.playlist-card {
+  width: 100px;
+  height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+.playlist-card:hover {
+  transform: scale(1.05);
+}
+
+/* Playlist Cover */
+.playlist-cover {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #ddd;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+.playlist-card:not(.add-card) .playlist-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.playlist-card:not(.add-card) .playlist-cover:hover::after {
+  opacity: 1;
+}
+
+/* Options Button */
+.options-button {
+  clip-path: circle(50%);
+}
+.playlist-card .options-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 3;
+  transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+}
+.playlist-card .options-button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border: none; 
+  border-radius: 50%;
+  padding: 5px;
+  z-index: 4;
+}
+.playlist-cover:hover .options-button,
+.options-button:hover {
+  opacity: 1;
+}
+.options-button:hover {
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid white;
+  border-radius: 50%;
+  padding: 5px;
+}
+
+/* Playlist Name */
+.playlist-name {
+  margin-top: 8px;
+  text-align: left;
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 8px 0 4px; 
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.playlist-info {
+  font-size: 12px;
+  color: #444;
+  text-align: left;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+//* Add Card *//
+.add-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #ddd;
+  cursor: pointer; 
+}
+.add-card .playlist-cover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.add-card:hover .plus-sign {
+  transform: scale(1.5);
+  transition: transform 0.3s ease;
+}
+.add-card .plus-sign {
+  font-size: 48px;
+  font-weight: bold;
+  color: gray;
+}

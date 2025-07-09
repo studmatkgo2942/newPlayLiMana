@@ -1,0 +1,98 @@
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: min(10px, 0.625rem);
+  
+  .song-card {
+    height: 3.5rem;;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    .cover {
+      width: 3.75rem;
+      height: 3.75rem;
+      background-size: cover;
+      background-position: center;
+      border-radius: 5px;
+      margin-right: 0.625rem;
+    }
+
+    .song-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      gap: 0;
+      
+      .upper-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        top: 0.5rem;
+
+        .song-title {
+          font-size: 1rem;
+          font-weight: bold;
+          color: #333;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin: 0;
+        }
+
+        .options-button {
+          font-size: 1.25rem;
+          background-color: transparent;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          width: 2rem;
+          height: 2rem;
+          margin-top: 0;
+          margin-left: 1rem;
+          
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+          }
+        }
+      
+      }
+      
+      .bottom-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #555;
+        align-items: center;
+
+        .song-artist {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .playtime {
+          white-space: nowrap;
+          margin-left: auto;
+        }
+
+      }
+
+    }
+
+  }
+
+  .song-card:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+}

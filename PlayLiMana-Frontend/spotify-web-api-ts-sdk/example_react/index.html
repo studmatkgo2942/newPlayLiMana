@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlayLiMana</title>
+  <link rel="icon" href="/favicon.ico" />
+
+
+  <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></script>
+
+  <script>
+    // Flags to coordinate with React
+    window.spotifyPlayerCallbackCalled = false;
+    window.spotifySDKReady = false;
+
+    // This function MUST exist before spotify-player.js runs
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      // Prevent multiple calls if script somehow loads twice
+      if (window.spotifyPlayerCallbackCalled) return;
+      window.spotifyPlayerCallbackCalled = true;
+
+      console.log('>>> Spotify SDK is ready! (Callback from index.html) <<<');
+      window.spotifySDKReady = true; // Set flag for React/PlaybackProvider
+      // Notify React that the SDK is ready via a custom event
+      document.dispatchEvent(new Event('spotify-sdk-ready'));
+    };
+  </script>
+
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <script type="module" src="./src/main.tsx"></script>
+</body>
+
+</html>

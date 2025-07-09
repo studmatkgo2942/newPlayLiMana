@@ -1,0 +1,2 @@
+include:
+  - local: 'PlayLiMana-Backend/.gitlab-ci.yml'

@@ -1,0 +1,212 @@
+.playlist-detail {
+  display: flex;
+  margin-top: 2.5rem;
+  margin-left: min(250px, 15.625rem);
+}
+
+.playlist-card {
+  width: min(250px, 15.625rem);
+  height: 100vh;
+  background-color: #f4f4f4; //#333;//#007bff;//
+  //border-right: 1px solid #ddd;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1.25rem;
+  position: fixed; /* Immer sichtbar, auch beim Scrollen */
+  top: 3.75rem; // 2rem + (2 * 0.625rem) = height_navbar + padding_navbar
+  left: 0;
+
+  .cover {
+    width: 100%;
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin-bottom: 0.3125rem;//5px;
+  }
+   @supports not (aspect-ratio: 1) {
+    height: 0;
+    padding-bottom: 100%;
+  }
+
+  .info {
+    text-align: center;
+    gap: 0;
+
+    .playlist-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;//5px;
+    }
+
+    .visibility {
+      margin-bottom: 0.25rem;//5px;
+      color: #888;
+      margin-top: 0;
+    }
+
+    .stats {
+      margin-bottom: 0.125rem;//2.5px;
+      color: #555;
+      margin-top: 0;
+    }
+  }
+
+ .description {
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+  }
+
+  .actions {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+
+    .btn {
+      flex: 1;
+      padding: 0.625rem 0.9375rem;//10px 15px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &.edit {
+        background-color: #666;
+        color: #fff;
+
+        .edit-icon {
+          width: 1.5rem;
+          height: 1.5rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+      }
+
+      &.play {
+        flex: 2;
+        background-color: #333;
+        color: #fff;
+
+        .play-icon {
+          width: 1.5rem;
+          height: 1.5rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2; 
+        }
+
+      }
+
+      &.more {
+        background-color: #666;
+        color: #fff;
+
+        .more-icon {
+          width: 1.5rem;
+          height: 1.5rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2; 
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+      }
+
+      &:hover {
+        opacity: 0.9;
+      }
+
+      .btn:not(:last-child) {
+        border-right: 1px solid #ccc; /* Nur die Trennelemente sichtbar */
+      }
+    }
+  }
+}
+
+.songs-section {
+  flex: 1; /* Nimmt den restlichen Platz ein */
+  padding: 1.5rem;//1.25rem;//20px;
+  overflow-y: auto; /* Ermöglicht Scrollen bei zu vielen Songs */
+    
+  .sort-menu {
+    display: flex;
+    width: min-content;
+    justify-self: flex-end;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;//20px;
+    margin-right: -1.5rem;;
+    
+    .sort-dropdown {
+      padding: 8px;
+      padding-right: 20px;
+      border: none;
+      border-right: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+      appearance: none; // disable default drop-down arrow
+      -webkit-appearance: none;
+      -moz-appearance: none; 
+      background-image: url('/assets/hamburger.svg');
+      background-repeat: no-repeat;
+      background-position: calc(100% + 40px ) calc(100% + 28px);
+      background-size: 100px;
+    }
+
+    .sort-dropdown:hover {
+      background-color: #f4f4f4;
+    }
+
+    .order-toggle {
+      padding: 0.5rem 0.75rem;//8px 12px;
+      position: relative;
+      border: none;
+      background: none;
+      font-size: 16px;
+      cursor: pointer;
+      transform-origin: center;
+      transition: transform 0.3s ease;
+    }
+
+    .order-toggle.rotate {
+      transform: rotate(-180deg);
+    }
+
+    .order-toggle:hover {
+      background-color: #f4f4f4;
+    }
+
+  }
+
+}
+
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  text-align: center;
+
+  .error-content {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+}

@@ -1,0 +1,200 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+}
+
+.popup {
+    background: var(--bg-primary, #1a1a1a);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color, #333);
+    animation: popupFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.titleSection {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary, #ffffff);
+    margin: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.closeButton:hover {
+    background: var(--shadow-color, rgba(255, 255, 255, 0.1));
+    color: var(--text-primary, #ffffff);
+    transform: scale(1.1);
+}
+
+.closeButton:focus-visible {
+    outline: 2px solid var(--text-accent, #1db954);
+    outline-offset: 2px;
+}
+
+.content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.description {
+    color: var(--text-secondary, #b3b3b3);
+    line-height: 1.5;
+}
+
+.description p {
+    margin: 0 0 0.75rem 0;
+}
+
+.description p:last-child {
+    margin-bottom: 0;
+}
+
+.description strong {
+    color: var(--text-primary, #ffffff);
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.secondaryButton {
+    background: var(--bg-secondary, #2a2a2a);
+    border: 1px solid var(--border-color, #333);
+    color: var(--text-primary, #ffffff);
+    padding: 0.75rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.secondaryButton:hover {
+    background: var(--shadow-color, rgba(255, 255, 255, 0.1));
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--shadow-color, rgba(0, 0, 0, 0.1));
+}
+
+.secondaryButton:focus-visible {
+    outline: 2px solid var(--text-accent, #1db954);
+    outline-offset: 2px;
+}
+
+.footer {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #b3b3b3);
+    margin: 0;
+    text-align: center;
+    line-height: 1.4;
+    opacity: 0.8;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .popup {
+        max-width: 100%;
+        margin: 0.5rem;
+        max-height: 90vh;
+    }
+
+    .header {
+        padding: 1rem;
+    }
+
+    .content {
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+
+    .actions {
+        gap: 0.5rem;
+    }
+}
+
+/* Dark mode enhancements */
+html.dark .popup {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border-color: #333333;
+}
+
+html.dark .overlay {
+    background: rgba(0, 0, 0, 0.8);
+}

@@ -1,0 +1,107 @@
+.search-section {
+    width: 100%;
+    text-align: left;
+}
+
+.search-section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    display: inline-block;
+    min-width: 200px;
+    text-align: left;
+}
+
+/* Artists Grid */
+.artists-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(200px, 1fr);
+    gap: 1rem;
+    align-items: start;
+    justify-content: start;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    width: 100%;
+}
+
+/* Songs Grid */
+.songs-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.5rem;
+    align-items: start;
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Albums Grid */
+.albums-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    justify-content: start;
+    width: 100%;
+}
+
+/* Custom scrollbar for artists grid */
+.artists-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.artists-grid::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.artists-grid::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 4px;
+}
+
+.artists-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--text-primary);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .search-section-title {
+        font-size: 1.5rem;
+        min-width: 150px;
+    }
+
+    .artists-grid {
+        grid-auto-columns: minmax(160px, 1fr);
+        gap: 0.75rem;
+    }
+
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    /* Songs grid becomes single column on mobile */
+    .songs-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-section-title {
+        font-size: 1.25rem;
+        min-width: 120px;
+    }
+
+    .artists-grid {
+        grid-auto-columns: minmax(140px, 1fr);
+        gap: 0.5rem;
+    }
+
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+}

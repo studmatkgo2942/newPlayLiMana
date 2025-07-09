@@ -1,0 +1,76 @@
+version: '3.3'
+
+services:
+  playlimana-dev:
+    container_name: playlimana-dev
+    build: .
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - gradle-cache:/home/gradle/.gradle
+    working_dir: /usr/src/app
+    command: ./gradlew quarkusDev
+    environment:
+      - Machine=DEV
+      - FRONTEND_URL=${FRONTEND_URL}
+      - QUARKUS_HTTP_PORT=9000
+      - QUARKUS_OPENTELEMETRY_ENABLED=true
+      - QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_PROTOCOL=grpc
+    networks:
+      - mynet
+    depends_on:
+      playlimana-db:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+
+  playlimana-db:
+    container_name: playlimana-db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: hibernate
+      POSTGRES_PASSWORD: P@ssw0rd
+      POSTGRES_DB: hibernate_db
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - mynet
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    volumes:
+      - ./otel-config.yaml:/etc/otelcol/config.yaml
+    command: [ "--config=/etc/otelcol/config.yaml" ]
+    ports:
+      - "4317:4317"
+    networks:
+      - mynet
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "14250:14250"
+    networks:
+      - mynet
+
+volumes:
+  data:
+  gradle-cache:
+
+networks:
+  mynet:

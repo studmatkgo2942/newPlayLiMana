@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+    id 'org.sonarqube' version "4.4.1.3373"
+    id 'jacoco'
+}
+
+group = 'org.playlimana'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    // Quarkus Platform BOM
+    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+
+    // Core Quarkus
+    implementation('io.quarkus:quarkus-arc')
+    implementation('io.quarkus:quarkus-security')
+
+    // REST API & JSON
+    implementation('io.quarkus:quarkus-rest')
+    implementation('io.quarkus:quarkus-rest-jackson')
+    implementation('io.quarkus:quarkus-rest-jsonb')
+    implementation('jakarta.ws.rs:jakarta.ws.rs-api:3.1.0')
+
+    // Database & ORM
+    implementation('io.quarkus:quarkus-jdbc-postgresql')
+    implementation('io.quarkus:quarkus-hibernate-orm-panache')
+
+    // Metrcis & OpenAPI & Swagger UI
+    implementation("io.quarkus:quarkus-smallrye-metrics")
+    implementation('io.quarkus:quarkus-swagger-ui')
+    implementation('io.quarkus:quarkus-smallrye-openapi')
+    implementation('io.swagger.core.v3:swagger-annotations:2.2.20')
+
+    // OpenTelemetry
+    implementation('io.quarkus:quarkus-opentelemetry')
+
+    // JWT
+    implementation('io.jsonwebtoken:jjwt-api:0.11.5')
+    runtimeOnly('io.jsonwebtoken:jjwt-impl:0.11.5')
+    runtimeOnly('io.jsonwebtoken:jjwt-jackson:0.11.5')
+
+    // Firebase Admin SDK for token verification
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+    implementation 'org.mindrot:jbcrypt:0.4'
+
+    // Testing
+    testImplementation('io.quarkus:quarkus-junit5')
+    testImplementation('io.rest-assured:rest-assured')
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jar {
+    manifest {
+        attributes('Main-Class': 'org.playlimana.PlayLiManaApplication')
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "https://inf-sonarqube.th-rosenheim.de"
+        property "sonar.projectKey", "PlayLiMana"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/customJacocoReportDir/test/jacocoTestReport.xml"
+        property "sonar.tests", "src/test/java"
+    }
+}

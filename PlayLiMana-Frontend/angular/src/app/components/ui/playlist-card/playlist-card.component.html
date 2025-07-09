@@ -1,0 +1,10 @@
+<div class="playlist-card" (click)="onPlaylistClick()">
+  <div 
+    class="playlist-cover" 
+    [ngStyle]="{'background-image': 'url(' + playlist.coverUrl + ')'}"
+  >
+    <button class="options-button">⋮</button>
+  </div>
+  <p class="playlist-name">{{ playlist.playlistName }}</p>
+  <p class="playlist-info">{{ playlist.numberOfSongs }} songs, {{ playlist.playtime | duration }}</p>
+</div>

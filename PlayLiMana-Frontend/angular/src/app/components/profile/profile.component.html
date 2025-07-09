@@ -1,0 +1,48 @@
+<form [formGroup]="form" class="profile-form">
+
+  <!-- Username (Email) Update -->
+  <div class="form-group">
+    <label for="newUsername">New Username (Email)</label>
+    <input
+      id="newUsername"
+      type="email"
+      formControlName="newUsername"
+      [class.invalid]="form.get('newUsername')?.invalid && form.get('newUsername')?.touched"
+      autocomplete="username"
+      placeholder="Enter new email"
+    />
+    <button
+      type="button"
+      (click)="onUpdateUsername()"
+      [disabled]="form.get('newUsername')?.invalid"
+    >Update Username</button>
+    <div class="input-error" *ngIf="form.get('newUsername')?.invalid && form.get('newUsername')?.touched">
+      Please enter a valid email.
+    </div>
+  </div>
+
+  <!-- Password Update -->
+  <div class="form-group">
+    <label for="newPassword">New Password</label>
+    <input
+      id="newPassword"
+      type="password"
+      formControlName="newPassword"
+      [class.invalid]="form.get('newPassword')?.invalid && form.get('newPassword')?.touched"
+      autocomplete="new-password"
+      placeholder="Enter new password"
+    />
+    <button
+      type="button"
+      (click)="onUpdatePassword()"
+      [disabled]="form.get('newPassword')?.invalid"
+    >Update Password</button>
+    <div class="input-error" *ngIf="form.get('newPassword')?.invalid && form.get('newPassword')?.touched">
+      Password must be at least 8 characters, with uppercase, lowercase, number, and special character.
+    </div>
+  </div>
+</form>
+
+<!-- Success/Error messages -->
+<p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+<p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

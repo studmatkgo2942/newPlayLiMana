@@ -1,0 +1,257 @@
+.playlistDetail {
+  display: flex;
+  margin-left: min(250px, 15.625rem);
+  min-height: calc(100vh - 60px - 70px);
+}
+
+.playlistCard {
+  width: min(250px, 15.625rem);
+  /* height: 100vh; */
+  background-color: var(--bg-navbar);
+  /*#f4f4f4; #333;//#007bff;// */
+  /* border-right: 1px solid #ddd; */
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1.25rem;
+  position: fixed;
+  /* Immer sichtbar, auch beim Scrollen */
+  top: 3.75rem;
+  /* 2rem + (2 * 0.625rem) = height_navbar + padding_navbar */
+  left: 0;
+  bottom: 0;
+
+
+  .cover {
+    width: 100%;
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin-bottom: 0.3125rem;
+    /* 5px; */
+  }
+
+  @supports not (aspect-ratio: 1) {
+    height: 0;
+    padding-bottom: 100%;
+  }
+
+  .info {
+    text-align: center;
+    gap: 0;
+
+    padding-right: 0.5rem;
+    padding-bottom: 0.3125rem;
+
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 0.3125rem;
+    margin-bottom: 70px;
+
+    .playlistName {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      color: var(--text-primary);
+      /* 5px; */
+
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .visibility {
+      margin-bottom: 0.25rem;
+      /* 5px; */
+      color: var(--text-secondary);
+      /* #888; */
+      margin-top: 0;
+    }
+
+    .stats {
+      margin-bottom: 0.125rem;
+      /* 2.5px; */
+      color: var(--text-primary);
+      /* #555; */
+      margin-top: 0;
+    }
+  }
+
+  .description {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    /* #666; */
+    font-size: 0.875rem;
+    white-space: nowrap;
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    max-width: 100%;
+    /* display: inline-block; */
+
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .actions {
+    display: flex;
+    border: 1px solid var(--border-color);
+    /* #ccc; */
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+
+    .btn {
+      flex: 1;
+      /* padding: 0.625rem 0.9375rem; */
+      /* 10px 15px; */
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      height: 2.5rem;
+
+      &.edit {
+        background-color: var(--text-secondary);
+        /* #666; */
+        color: var(--navbar-search-bg);
+        /* #fff; */
+
+        .editIcon {
+          width: 1.5rem;
+          height: 1.5rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+      }
+
+      &.play {
+        flex: 2;
+        /*background-color: var(--text-accent);
+        /* #333; */
+        /*color: #fff;*/
+
+        background-color: var(--text-accent);
+        /* #666; */
+        color: var(--navbar-search-bg);
+        /* #fff; */
+
+        .playIcon {
+          width: 2rem;
+          height: 2rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2.5;
+        }
+
+      }
+
+      &.more {
+        background-color: var(--text-secondary);
+        /* #666; */
+        color: var(--navbar-search-bg);
+        /* #fff; */
+        /* font-size: large; */
+        /*
+        .more-icon {
+          width: 1.5rem;
+          height: 0.1rem;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        */
+
+      }
+
+      &:hover {
+        opacity: 0.9;
+      }
+
+      .btn:not(:last-child) {
+        border-right: 1px solid #ccc;
+        /* Nur die Trennelemente sichtbar */
+      }
+    }
+  }
+}
+
+.songsSection {
+  flex: 1;
+  /* Nimmt den restlichen Platz ein */
+  padding: 1.5rem;
+  /* 1.25rem;//20px; */
+  overflow-y: auto;
+  /* Ermöglicht Scrollen bei zu vielen Songs */
+
+  .sortMenu {
+    display: flex;
+    width: min-content;
+    justify-self: flex-end;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    /* 20px; */
+    margin-right: -1.5rem;
+
+    .orderToggle {
+      padding: 0.5rem 0.75rem;
+      /* 8px 12px; */
+      position: relative;
+      border: none;
+      background: none;
+      font-size: 16px;
+      cursor: pointer;
+      transform-origin: center;
+      transition: transform 0.3s ease;
+    }
+
+    .orderToggle.rotate {
+      transform: rotate(-180deg);
+    }
+
+    .orderToggle:hover {
+      background-color: #f4f4f4;
+    }
+
+  }
+
+}
+
+.errorMessage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  text-align: center;
+
+  .errorContent {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.button {
+  padding: 7px 7px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  border-radius: 0;
+  cursor: pointer;
+  background-color: var(--text-accent);
+  color: white;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+}

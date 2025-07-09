@@ -1,0 +1,426 @@
+import type React from "react"
+import { useState, useRef, forwardRef, useImperativeHandle } from "react"
+
+import PlaylistPopupViews from "./PlaylistPopupViews"
+import type { Playlist } from "../../../models/playlist"
+import { useSpotifyContext } from "../../../context/SpotifyContext"
+import {
+    createPlaylist,
+    editPlaylist,
+    importSpotifyPlaylists,
+    SpotifyPlaylistData
+} from "../../../services/playlist/playlistApi.ts";
+
+export const PopupState = {
+    HIDDEN: -1,
+    ERROR: 0,
+    ADD_PLAYLIST: 1,
+    CREATE_PLAYLIST: 2,
+    EDIT_PLAYLIST: 3,
+    CHOOSE_SERVICE: 4,
+    IMPORT_PLAYLIST: 5,
+}
+
+const VALID_CHARACTERS_REGEX = /^[\p{L}\p{N} _\-.\u2000-\u206F\u2B50\u2600-\u26FF]*$/u;
+
+type SpotifyPlaylist = {
+    id: string
+    name: string
+    description: string
+    images: Array<{ url: string }>
+    tracks: { total: number }
+    public: boolean
+    owner: { display_name: string }
+}
+
+type PlaylistPopupProps = {
+    onPlaylistCreated: (playlist: Playlist) => void
+    onPlaylistEdited: (playlist: Playlist) => void
+    onPlaylistsImported: (playlists: Playlist[]) => void
+}
+
+export interface PlaylistPopupRef {
+    goToAddPlaylistPage: () => void;
+    goToEditPlaylistPage: (playlist: Playlist) => void;
+}
+
+const PlaylistPopup = forwardRef<PlaylistPopupRef, PlaylistPopupProps>(
+    (
+        {
+            onPlaylistCreated,
+            onPlaylistEdited,
+            onPlaylistsImported = (playlists) => {
+                console.log("Playlists imported:", playlists)
+            },
+        },
+        ref,
+    ) => {
+        const { sdk } = useSpotifyContext()
+
+        const [popupPage, setPopupPage] = useState(PopupState.HIDDEN)
+        const [playlistName, setPlaylistName] = useState("")
+        const [playlistDescription, setPlaylistDescription] = useState("")
+        const [visibility, setVisibility] = useState("Public")
+        const [exportToPlayLiMana, setExportToPlayLiMana] = useState(true)
+        const [exportToSpotify, setExportToSpotify] = useState(false)
+        const [exportToAudius, setExportToAudius] = useState(false)
+        const [isNameEmpty, setIsNameEmpty] = useState(false)
+        const [hasInvalidCharsName, setHasInvalidCharsName] = useState(false)
+        const [hasInvalidCharsDescription, setHasInvalidCharsDescription] = useState(false)
+        const [isLoading, setIsLoading] = useState(false)
+        const [errorMessage, setErrorMessage] = useState("")
+        const [playlistToEdit, setPlaylistToEdit] = useState<Playlist | null>(null)
+
+        // Spotify playlist import states
+        const [spotifyPlaylists, setSpotifyPlaylists] = useState<SpotifyPlaylist[]>([])
+        const [selectedSpotifyPlaylists, setSelectedSpotifyPlaylists] = useState<string[]>([])
+        const [isLoadingSpotifyPlaylists, setIsLoadingSpotifyPlaylists] = useState(false)
+        const [spotifyPlaylistsError, setSpotifyPlaylistsError] = useState("")
+
+        const playlistNameRef = useRef<HTMLInputElement>(null)
+        const descriptionRef = useRef<HTMLTextAreaElement>(null)
+        const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+        useImperativeHandle(ref, () => ({
+            goToAddPlaylistPage,
+            goToEditPlaylistPage,
+        }))
+
+        const resetForm = () => {
+            setPlaylistName("")
+            setPlaylistDescription("")
+            setVisibility("Public")
+            setExportToPlayLiMana(true)
+            setExportToSpotify(false)
+            setExportToAudius(false)
+            setIsNameEmpty(false)
+            setHasInvalidCharsName(false)
+            setHasInvalidCharsDescription(false)
+            setIsLoading(false)
+            setErrorMessage("")
+            setPlaylistToEdit(null)
+            setSpotifyPlaylists([])
+            setSelectedSpotifyPlaylists([])
+            setIsLoadingSpotifyPlaylists(false)
+            setSpotifyPlaylistsError("")
+        }
+
+        const focusDescription = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === "Enter") {
+                e.preventDefault()
+                descriptionRef.current?.focus()
+            }
+        }
+
+        const closePopup = () => setPopupPage(PopupState.HIDDEN)
+        const goToAddPlaylistPage = () => setPopupPage(PopupState.ADD_PLAYLIST)
+        const goToNewPlaylistPage = (reset = true) => {
+            if (reset) resetForm()
+            setPopupPage(PopupState.CREATE_PLAYLIST)
+        }
+        const goToEditPlaylistPage = (playlist: Playlist) => {
+            setPlaylistToEdit(playlist)
+            setPlaylistName(playlist.playlistName)
+            setPlaylistDescription(playlist.description || "")
+            setVisibility(playlist.visibility)
+            setExportToPlayLiMana(true)
+            setExportToSpotify(false)
+            setExportToAudius(false)
+            setIsNameEmpty(false)
+            setHasInvalidCharsName(false)
+            setHasInvalidCharsDescription(false)
+            setPopupPage(PopupState.EDIT_PLAYLIST)
+        }
+        const goToChooseServicePage = () => setPopupPage(PopupState.CHOOSE_SERVICE)
+        const goToImportPlaylistPage = async () => {
+            setPopupPage(PopupState.IMPORT_PLAYLIST)
+            setSpotifyPlaylistsError("")
+            setSelectedSpotifyPlaylists([])
+            await fetchSpotifyPlaylists()
+        }
+        const goToErrorPage = () => setPopupPage(PopupState.ERROR)
+
+        const fetchSpotifyPlaylists = async () => {
+            if (!sdk) {
+                setSpotifyPlaylistsError("Spotify SDK not available")
+                return
+            }
+
+            setIsLoadingSpotifyPlaylists(true)
+            setSpotifyPlaylistsError("")
+
+            try {
+                console.log("Fetching Spotify playlists...")
+                const playlistsResponse = await sdk.currentUser.playlists.playlists(50, 0)
+                console.log("Spotify playlists response:", playlistsResponse)
+
+                const playlists: SpotifyPlaylist[] = playlistsResponse.items.map((playlist) => ({
+                    id: playlist.id,
+                    name: playlist.name,
+                    description: playlist.description || "",
+                    images: playlist.images || [],
+                    tracks: { total: playlist.tracks?.total ?? 0 },
+                    public: playlist.public,
+                    owner: { display_name: playlist.owner.display_name },
+                }))
+
+                setSpotifyPlaylists(playlists)
+                console.log(`Loaded ${playlists.length} Spotify playlists`)
+            } catch (error) {
+                console.error("Error fetching Spotify playlists:", error)
+                setSpotifyPlaylistsError("Failed to load playlists from Spotify")
+            } finally {
+                setIsLoadingSpotifyPlaylists(false)
+            }
+        }
+
+        const onToggleSpotifyPlaylist = (playlistId: string) => {
+            setSelectedSpotifyPlaylists((prev) =>
+                prev.includes(playlistId) ? prev.filter((id) => id !== playlistId) : [...prev, playlistId],
+            )
+        }
+
+        const onImportSelectedPlaylists = async () => {
+            if (!sdk || selectedSpotifyPlaylists.length === 0) return
+
+            setIsLoading(true)
+            setErrorMessage("")
+
+            try {
+                console.log("🎵 Starting playlist import for:", selectedSpotifyPlaylists)
+
+                const playlistsData: SpotifyPlaylistData[] = []
+
+                for (const playlistId of selectedSpotifyPlaylists) {
+                    const playlist = spotifyPlaylists.find((p) => p.id === playlistId)
+                    if (!playlist) {
+                        console.warn(`Playlist with ID ${playlistId} not found`)
+                        continue
+                    }
+
+                    try {
+                        console.log(`🔍 Fetching tracks for: "${playlist.name}"`)
+
+                        // Fetch playlist tracks from Spotify API
+                        const tracksResponse = await sdk.playlists.getPlaylistItems(
+                            playlistId,
+                            "US",
+                            "items(track(id,name,artists(name),album(name,images,release_date),duration_ms,preview_url,external_urls,uri))")
+
+                        console.log(`📥 Got ${tracksResponse.items?.length || 0} track items for "${playlist.name}"`)
+
+                        if (!tracksResponse || !tracksResponse.items) {
+                            console.error(`Invalid tracks response for playlist ${playlist.name}`)
+                            continue
+                        }
+
+                        // Prepare data for import (no intermediate conversion)
+                        const playlistData: SpotifyPlaylistData = {
+                            spotifyId: playlist.id,
+                            name: playlist.name,
+                            description: playlist.description || "",
+                            isPublic: playlist.public,
+                            images: playlist.images || [],
+                            // Pass raw Spotify API data directly
+                            tracksData: tracksResponse.items,//.map((item) => item.track),
+                        }
+
+                        playlistsData.push(playlistData)
+                        console.log(`✅ Prepared "${playlist.name}" with ${tracksResponse.items.length} track items`)
+                    } catch (trackError) {
+                        console.error(`Error fetching tracks for playlist "${playlist.name}":`, trackError)
+                        continue
+                    }
+                }
+
+                if (playlistsData.length === 0) {
+                    throw new Error("No playlists could be processed. Please try again.")
+                }
+
+                console.log(`🚀 Importing ${playlistsData.length} playlists...`)
+
+                // Import using the consolidated API
+                const importedPlaylists = await importSpotifyPlaylists(playlistsData)
+
+                console.log("🎉 Successfully imported playlists:", importedPlaylists)
+
+                // Notify parent component
+                if (typeof onPlaylistsImported === "function") {
+                    onPlaylistsImported(importedPlaylists)
+                }
+
+                closePopup()
+                resetForm()
+            } catch (error) {
+                console.error("❌ Error importing playlists:", error)
+                if (error instanceof Error) {
+                    setErrorMessage(`Failed to import playlists: ${error.message}`)
+                } else {
+                    setErrorMessage("Failed to import playlists: Unknown error")
+                }
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        const onNameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value
+            setPlaylistName(value)
+            const invalidChars = !VALID_CHARACTERS_REGEX.test(value)
+            setHasInvalidCharsName(invalidChars)
+            const trimmedName = value.trim()
+            if (trimmedName !== "") {
+                setIsNameEmpty(false)
+            }
+        }
+
+        const onDescriptionInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const value = e.target.value
+            setPlaylistDescription(value)
+            const hasInvalidChars = !VALID_CHARACTERS_REGEX.test(value)
+            const isEmpty = value.trim() === ""
+            setHasInvalidCharsDescription(hasInvalidChars && !isEmpty)
+        }
+
+        const onOkButtonClick = async () => {
+            console.log("Ok Button pressed. Playlist:", playlistToEdit)
+            const trimmedName = playlistName.trim()
+            const isEmpty = trimmedName === ""
+            const invalidCharsName = !VALID_CHARACTERS_REGEX.test(trimmedName)
+            const invalidCharsDescription = !VALID_CHARACTERS_REGEX.test(playlistDescription)
+            setIsNameEmpty(isEmpty)
+            setHasInvalidCharsName(!isEmpty && invalidCharsName)
+            if (isEmpty || invalidCharsName) {
+                setTimeout(() => playlistNameRef.current?.focus(), 0)
+                return
+            }
+            if (invalidCharsDescription) {
+                setTimeout(() => descriptionRef.current?.focus(), 0)
+                return
+            }
+            if (popupPage === PopupState.EDIT_PLAYLIST) {
+                await handleEditPlaylist()
+            } else {
+                await handleCreatePlaylist()
+            }
+        }
+
+        const handleCreatePlaylist = async () => {
+            timeoutRef.current = setTimeout(() => {
+                setIsLoading(false)
+                setErrorMessage("Request timed out. Please try again later.")
+                goToErrorPage()
+            }, 10000)
+            setIsLoading(true)
+            const newPlaylist: Playlist = {
+                playlistId: -1,
+                playlistName,
+                description: playlistDescription,
+                visibility: visibility.toUpperCase(),
+                sorting: "CUSTOM",
+                songs: [],
+                numberOfSongs: 0,
+                playtime: 0,
+                dateAdded: new Date(),
+            }
+            try {
+                const response = await createPlaylist(newPlaylist)
+                clearTimeout(timeoutRef.current)
+                onPlaylistCreated({ ...newPlaylist, playlistId: response.playlistId })
+                closePopup()
+                resetForm()
+                console.log("Playlist created :)")
+            } catch (err) {
+                clearTimeout(timeoutRef.current)
+                console.error("Error creating playlist:", err)
+                setErrorMessage("Error creating playlist. Please try again later.")
+                goToErrorPage()
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        const handleEditPlaylist = async () => {
+            if (!playlistToEdit) return
+            timeoutRef.current = setTimeout(() => {
+                setIsLoading(false)
+                setErrorMessage("Request timed out. Please try again later.")
+                goToErrorPage()
+            }, 10000)
+            setIsLoading(true)
+            const updatedPlaylist: Playlist = {
+                ...playlistToEdit,
+                playlistName,
+                description: playlistDescription,
+                visibility: visibility.toUpperCase(),
+            }
+            try {
+                await editPlaylist(updatedPlaylist)
+                clearTimeout(timeoutRef.current)
+                onPlaylistEdited(updatedPlaylist)
+                closePopup()
+                resetForm()
+            } catch (err) {
+                clearTimeout(timeoutRef.current)
+                console.error("Error editing playlist:", err)
+                setErrorMessage("Error editing playlist. Please try again later.")
+                goToErrorPage()
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        const onTryAgainClick = () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current)
+                timeoutRef.current = null
+            }
+            goToNewPlaylistPage(false)
+        }
+
+        return (
+            <>
+                {popupPage !== PopupState.HIDDEN && (
+                    <PlaylistPopupViews
+                        popupPage={popupPage}
+                        errorMessage={errorMessage}
+                        isLoading={isLoading}
+                        isNameEmpty={isNameEmpty}
+                        hasInvalidCharsName={hasInvalidCharsName}
+                        hasInvalidCharsDescription={hasInvalidCharsDescription}
+                        playlistName={playlistName}
+                        playlistDescription={playlistDescription}
+                        visibility={visibility}
+                        exportToPlayLiMana={exportToPlayLiMana}
+                        exportToSpotify={exportToSpotify}
+                        exportToAudius={exportToAudius}
+                        spotifyPlaylists={spotifyPlaylists}
+                        selectedSpotifyPlaylists={selectedSpotifyPlaylists}
+                        isLoadingSpotifyPlaylists={isLoadingSpotifyPlaylists}
+                        spotifyPlaylistsError={spotifyPlaylistsError}
+                        onNameInput={onNameInput}
+                        onDescriptionInput={onDescriptionInput}
+                        onOkButtonClick={onOkButtonClick}
+                        closePopup={closePopup}
+                        onTryAgainClick={onTryAgainClick}
+                        goToNewPlaylistPage={goToNewPlaylistPage}
+                        goToAddPlaylistPage={goToAddPlaylistPage}
+                        goToChooseServicePage={goToChooseServicePage}
+                        goToImportPlaylistPage={goToImportPlaylistPage}
+                        onImportSelectedPlaylists={onImportSelectedPlaylists}
+                        onToggleSpotifyPlaylist={onToggleSpotifyPlaylist}
+                        focusDescription={focusDescription}
+                        descriptionRef={descriptionRef}
+                        playlistNameRef={playlistNameRef}
+                        setVisibility={setVisibility}
+                        setExportToPlayLiMana={setExportToPlayLiMana}
+                        setExportToSpotify={setExportToSpotify}
+                        setExportToAudius={setExportToAudius}
+                    />
+                )}
+            </>
+        )
+    },
+)
+
+export default PlaylistPopup

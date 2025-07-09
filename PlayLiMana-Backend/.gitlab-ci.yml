@@ -1,0 +1,58 @@
+stages:
+  - build
+  - test
+  - analyse
+  - deploy
+
+variables:
+  PROJECT_DIR: "./PlayLiMana-Backend"
+  DOCKER_TLS_CERTDIR: ""
+
+build:
+  stage: build
+  image: gradle:8.7.0-jdk17
+  script:
+    - cd $PROJECT_DIR
+    - gradle assemble -x test
+    - echo "compiling and creating deployable artifact"
+
+test:
+  stage: test
+  image: gradle:8.7.0-jdk17
+  dependencies:
+    - build
+  script:
+    - cd $PROJECT_DIR
+    - echo "Running Unit Tests and Generating Coverage Report"
+    - gradle test jacocoTestReport
+  artifacts:
+    paths:
+      - $PROJECT_DIR/build/customJacocoReportDir/test/jacocoTestReport.xml
+    expire_in: 1 hour
+
+analyse:
+  stage: analyse
+  image: gradle:8.7.0-jdk17
+  dependencies:
+    - test
+  script:
+    - cd $PROJECT_DIR
+    - echo "Running SonarQube Analysis"
+    - gradle sonar -Dsonar.token=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=build/customJacocoReportDir/test/jacocoTestReport.xml
+
+dockerize:
+  image: docker:latest
+  stage: deploy
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cd $PROJECT_DIR
+    - VERSION_TAG=$(date +'%Y%m%d')
+    - IMAGE_TAG="$CI_REGISTRY_IMAGE:$VERSION_TAG"
+    - docker build -t "$IMAGE_TAG" -f Dockerfile .
+    - docker tag "$IMAGE_TAG" "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker logout $CI_REGISTRY

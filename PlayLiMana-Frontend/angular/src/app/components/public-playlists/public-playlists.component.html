@@ -1,0 +1,19 @@
+<h2>Explore Public Playlists</h2>
+
+<div *ngIf="loading">Loading...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="!loading && publicPlaylists.length === 0">
+  No public playlists found.
+</div>
+
+<div class="playlist-grid">
+  <div class="playlist-card" *ngFor="let playlist of publicPlaylists" (click)="viewPlaylist(playlist)">
+    <img [src]="playlist.coverUrl" alt="Playlist Cover" class="playlist-image" />
+    <div class="playlist-name">{{ playlist.playlistName }}</div>
+    <div class="playlist-meta">
+      <span>{{ playlist.numberOfSongs }} songs</span>
+      <span>{{ playlist.playtime | duration }}</span>
+    </div>
+  </div>
+</div>

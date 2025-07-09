@@ -1,0 +1,48 @@
+<nav class="navbar">
+  <!-- Left -->
+  <div class="navbar-left">
+    <a routerLink="/" class="navbar-brand">PlayLiMana</a>
+    <!--
+    <div *ngIf="isAuthenticated$ | async" class="navbar-links">
+      <a routerLink="/" class="navbar-link">Search</a>
+      <a routerLink="/profile" class="navbar-link">Profile</a>
+      <a routerLink="/settings" class="navbar-link">Settings</a>
+    </div>
+    -->
+  </div>
+
+  <!-- Central -->
+  <div class="navbar-center">
+    <!-- [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange($event)"
+    -->
+    <input
+      type="search"
+      placeholder="Search..."
+      class="navbar-search-input"
+      [disabled]="!(isAuthenticated$)"
+      [title]="(isAuthenticated$) ? 'Search Spotify' : 'Please log in to search'"
+    />
+  </div>
+
+  <!-- Right -->
+  <div class="navbar-right">
+    <!-- Not authenticated -->
+    <button *ngIf="!(isAuthenticated$ | async)" class="navbar-login-button">
+      Login with Spotify
+    </button>
+
+    <!-- Logged in -->
+    <div *ngIf="loadingProfile" class="profile-loading">...</div>
+    <ng-container *ngIf=true>
+      <a routerLink="/profile" class="profile-section" [title]="'View profile for ' + displayName">
+        <span class="profile-name">{{ displayName }}</span>
+        <img *ngIf="profileImageUrl" [src]="profileImageUrl" alt="Profile" class="profile-image" />
+        <div *ngIf="!profileImageUrl" class="profile-initials">{{ initials }}</div>
+      </a>
+    </ng-container>
+
+    <!-- Fallback: user without profile -->
+    <div *ngIf="!true && !loadingProfile" title="Profile error" class="profile-section-anon">!</div>
+  </div>
+</nav>

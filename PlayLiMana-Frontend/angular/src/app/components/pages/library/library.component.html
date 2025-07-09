@@ -1,0 +1,50 @@
+<!-- Library Header -->
+<div class="library-header">
+  <h1>My Library</h1>
+  <div class="library-controls">
+    <!-- <button class="pagination-button">&lt;</button>
+    <button class="pagination-button">&gt;</button> -->
+    <div class="sort-menu">
+      <select class="sort-dropdown" (change)="onSortSelectionChange($event)">
+        <option value="Recently Added">RecentlyAdded</option>
+        <option value="Alphabetical">Alphabetical</option>
+        <option value="Number of Songs">Number of Songs</option>
+        <option value="Total Playtime">Total Playtime</option>
+      </select>
+      <button class="order-toggle" aria-label="Descending" (click)="toggleSortingOrder()">↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Separation line -->
+<hr class="library-separator" />
+
+<!-- Playlist Grid -->
+<div class="playlist-grid">
+
+ <!-- Add Card -->
+ <div class="playlist-card add-card" (click)="popup.goToAddPlaylistPage()">
+    <div class="playlist-cover">
+      <div class="plus-sign">+</div>
+    </div>
+    <p class="playlist-name">Add Playlist</p>
+  </div>
+
+  <!-- Playlist Cards -->
+  <app-playlist-card
+    *ngFor="let playlist of playlists"
+    [playlist]="playlist"
+    (playlistClick)="goToPlaylist($event)"
+  >
+    <!--[routerLink]="['/playlist', playlist.playlistId]"
+    routerLinkActive="active"-->
+    <div class="playlist-cover" [ngStyle]="{'background-image': 'url(' + playlist.coverUrl + ')'}">
+      <button class="options-button">⋮</button>
+    </div>
+      <p class="playlist-name">{{ playlist.playlistName }}</p>
+      <p class="playlist-info">{{playlist.numberOfSongs}} songs, {{playlist.playtime | duration}}</p>
+  </app-playlist-card>
+</div>
+
+<!-- Playlist Popup -->
+<app-playlist-popup #popup (playlistCreated)="handlePlaylistCreated($event)"></app-playlist-popup>

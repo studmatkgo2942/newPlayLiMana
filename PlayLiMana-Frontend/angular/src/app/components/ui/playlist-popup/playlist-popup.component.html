@@ -1,0 +1,159 @@
+<!-- Error Page (Page 0)-->
+<div class="popup-overlay" *ngIf="popupPage==0">
+  <div class="popup">
+    <div class="popup-header">
+      <h2 class="error-title">Error</h2>
+    </div>
+    <div class="popup-body">
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+    <div class="popup-footer">
+      <button class="back-button" (click)="goToNewPlaylistPage(false)">Try Again</button>
+      <button class="ok-button" (click)="closePopup()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Playlist Popup (Page 1) -->
+<div class="popup-overlay" *ngIf="popupPage==1">
+  <div class="popup">
+    <div class="popup-header">
+      <h2>Add Playlist</h2>
+      <button class="close-button" (click)="closePopup()">×</button>
+    </div>
+    <div class="popup-body">
+      <button class="popup-button">Import Playlist from Service</button>
+      <button class="popup-button" (click)="goToNewPlaylistPage()">Create new Playlist</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Playlist Pop-Up (Page 2) -->
+<div class="popup-overlay" *ngIf="popupPage==2">
+  <div class="popup">
+    <div class="popup-header">
+      <h2>New Playlist</h2>
+      <button class="close-button" (click)="closePopup()">×</button>
+    </div>
+    <div class="popup-body" [class.disabled]="isLoading">
+
+      <!-- Playlist Name -->
+      <div class="form-group">
+        <label for="playlistName">
+          Playlist Name
+          <span class="error-text" *ngIf="isNameInvalid">A name is required!</span>
+        </label>
+        <input type="text" id="playlistName" maxlength="100" placeholder="Enter a name for your playlist"
+          [(ngModel)]="playlistName" [disabled]="isLoading" [class.invalid]="isNameInvalid" (input)="onNameInput()"
+          #playlistNameRef autofocus (keydown.enter)="focusDescription($event)" />
+      </div>
+
+      <!-- Playlist Description -->
+      <div class="form-group">
+        <label for="playlistDescription">Playlist Description</label>
+        <textarea id="playlistDescription" maxlength="250" placeholder="Enter a description (optional)"
+          [(ngModel)]="playlistDescription" [disabled]="isLoading" #descriptionRef></textarea>
+      </div>
+
+      <!-- Visibility Dropdown -->
+      <div class="form-group">
+        <label for="visibility">Visibility</label>
+        <select id="visibility" [(ngModel)]="visibility" [disabled]="isLoading">
+          <option value="Public">Public</option>
+          <option value="Shared">Shared</option>
+          <option value="Private">Private</option>
+        </select>
+      </div>
+
+      <!-- Export Options -->
+      <div class="form-group">
+        <label for="export">Export to...</label>
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="exportToPlayLiMana" checked [disabled]="isLoading" />
+            PlayLiMana
+          </label>
+          <label>
+            <input type="checkbox" [(ngModel)]="exportToSpotify" [disabled]="isLoading" />
+            <img src="assets/Spotify.svg" alt="Spotify Icon" class="icon" />
+            Spotify
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="popup-footer">
+      <button class="back-button" [disabled]="isLoading" (click)="goToAddPlaylistPage()">Back</button>
+      <button class="ok-button" [disabled]="isLoading" (click)="onOkButtonClick()">
+        <span *ngIf="!isLoading">OK</span>
+        <div *ngIf="isLoading" class="loader-inner ball-clip-rotate"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Playlist Pop-Up (Page 3) -->
+<div class="popup-overlay" *ngIf="popupPage==3">
+  <div class="popup">
+    <div class="popup-header">
+      <h2>Edit Playlist</h2>
+      <button class="close-button" (click)="closePopup()">×</button>
+    </div>
+    <div class="popup-body" [class.disabled]="isLoading">
+
+      <!-- Playlist Name -->
+      <div class="form-group">
+        <label for="playlistName">
+          Playlist Name
+          <span class="error-text" *ngIf="isNameInvalid">A name is required!</span>
+        </label>
+        <input type="text" id="playlistName" maxlength="100" placeholder="Enter a name for your playlist"
+          [(ngModel)]="playlistName" [disabled]="isLoading" [class.invalid]="isNameInvalid" (input)="onNameInput()"
+          #playlistNameRef autofocus (keydown.enter)="focusDescription($event)" />
+      </div>
+
+      <!-- Playlist Description -->
+      <div class="form-group">
+        <label for="playlistDescription">Playlist Description</label>
+        <textarea id="playlistDescription" maxlength="250" placeholder="Enter a description (optional)"
+          [(ngModel)]="playlistDescription" [disabled]="isLoading" #descriptionRef></textarea>
+      </div>
+
+      <!-- Visibility Dropdown -->
+      <div class="form-group">
+        <label for="visibility">Visibility</label>
+        <select id="visibility" [(ngModel)]="visibility" [disabled]="isLoading">
+          <option value="Public">Public</option>
+          <option value="Shared">Shared</option>
+          <option value="Private">Private</option>
+        </select>
+      </div>
+
+      <!-- Export Options -->
+      <div class="form-group">
+        <label for="export">Export to...</label>
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="exportToPlayLiMana" checked [disabled]="isLoading" />
+            PlayLiMana
+          </label>
+          <label>
+            <input type="checkbox" [(ngModel)]="exportToSpotify" [disabled]="isLoading" />
+            <img src="assets/Spotify.svg" alt="Spotify Icon" class="icon" />
+            Spotify
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="popup-footer">
+      <button class="back-button" [disabled]="isLoading" (click)="closePopup()">Cancel</button>
+      <button class="ok-button" [disabled]="isLoading" (click)="onOkButtonClick()">
+        <span *ngIf="!isLoading">Save</span>
+        <div *ngIf="isLoading" class="loader-inner ball-clip-rotate"></div>
+      </button>
+    </div>
+  </div>
+</div>

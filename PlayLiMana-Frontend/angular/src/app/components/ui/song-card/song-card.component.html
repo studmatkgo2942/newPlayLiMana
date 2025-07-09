@@ -1,0 +1,15 @@
+<div class="song-list">
+  <div class="song-card" *ngFor="let song of songs">
+    <div class="cover" [style.backgroundImage]="'url(' + (song.coverUrl | validImageUrl:'song') + ')'"></div>
+    <div class="song-info">
+      <div class="upper-row">
+        <p class="song-title">{{ song.title }}</p>
+        <button class="options-button">⋮</button>
+      </div>
+      <div class="bottom-row">
+        <p class="song-artist">{{ song.artists }}</p>
+        <div class="playtime">{{ song.playtime | duration }} <span style="display: none">{{ logValue(song, song.playtime) }}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
